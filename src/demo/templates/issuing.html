@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>AuditableBlindCA - Issuing</title>
+  
+  <link rel="stylesheet" href="../static/css/normalize.min.css">
+  <link rel="stylesheet" href="../static/css/style.css">
+  <!-- Fonts -->
+  <link href='../static/fonts/roboto.css' rel='stylesheet' type='text/css'>
+  <link href="../static/fonts/font.min.css" rel="stylesheet" type="text/css">
+  <!-- // Fonts -->
+
+  <script type="text/javascript" src= "../static/js/jquery.min.js"></script>
+  <script type="text/javascript" src= "../static/js/issuing.js"></script>
+  <script type="text/javascript" src= "../static/js/domain.js"></script>
+  
+</head>
+<body>
+		<!-- Vertical Timeline -->
+		<section id="conference-timeline">
+		<div class="container">
+		<ol class="timeline">
+		<li>
+		<p class="lined">Preparation </p>
+		<a href = "index" id = "a_index"><span class="pointed"></span></a>
+		</li>
+
+		<li>
+		<p class="lined">Issuing</p>
+		<a href = "issuing" id = "a_issuing"><span class="pointed"></span></a>
+		</li>
+
+		<li>
+		<p class="line">Verifying</p>
+		<a href = "verifying" id = "a_verifying"><span class="point"></span></a>
+		</li>
+
+		<li>
+		<p class="line">Tracing</p>
+		<a href = "tracing" id = "a_tracing"><span class="point"></span></a>
+		</li>
+		</ol>
+		</div>
+		Issuing the credential
+		<hr>
+		<!-- Article -->
+		<div class="timeline-article">
+			<div class="content-right-container">
+				<div class="content-right">
+				<p><span class="article-number">User</span>
+				&#955; <font color = "red">(private)</font>  = &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;<span class=""><input id = "gamma"></input></span><br>
+		        &#958; (public) = g<sup>&#955;</sup> = <span class=""><input id = "xi"></input></span><br>
+				&#918; = &#919;<sub>1</sub>(p,q,g,h,y) = <span class=""><input id = "z"></input></span><br>
+				&#918;<sub>u</sub> = &#918;<sup>1\&#955;</sup> = <span class=""><input id = "zu"></input><input id = "y" type ="hidden"></input></span><br>
+				</p>
+				<!--  <a href = "javascript: void(0)" class="" id = "">Send</a> <br> -->
+				</div>
+			</div>
+		</div>
+		<!-- // Article --> 
+
+		<!-- Article -->
+		<div class="timeline-article">
+			<div class="content-left-container">
+				<div class="content-left"> 
+				<p> <span class="article-number">Issuer</span>
+				Pre-set parameters: <br>
+				<label for="description"> &#965;&nbsp; = </label>
+				<span class=""><input id = "upsilon"></input></span><br>
+				<label for="description">&#956;&nbsp; = </label>
+				<span class=""><input id = "mu"></input></span><br>
+				<label for="description">s<sub>1</sub> = </label>
+				<span class=""><input id = "s1"></input></span><br>
+				<label for="description">s<sub>2</sub> = </label>
+				<span class=""><input id = "s2"></input></span><br>
+				<label for="description">d = </label>
+				<span class=""><input id = "d"></input></span><br>
+				
+				<hr>
+				<a href = "javascript: void(0)" class="" id = "issuerExecuteTwo">Execute</a> <br><br>
+				<label class="textdescription">z<sub>1</sub> = yt<sup>&#965;</sup> = </label>
+				<span class=""><input id = "z1"></input></span> <br>
+				<label class="textdescription">z<sub>2</sub> = zu/z1 = </label>
+				<span class=""><input id = "z2"></input></span> <br>
+				
+				<label class="textdescription">a = g <sup>&#956;</sup> = </label>
+				<span class=""><input id = "a"></input></span><br>
+				
+				<label class="textdescription">b<sub>1</sub> = g <sup>s<sub>1</sub></sup> z<sub>1</sub> <sup>d</sup></label>
+				<span class=""><input id = "b1"></input></span><br>
+				
+				<label class="textdescription">b<sub>2</sub> = h <sup>s<sub>2</sub></sup> z<sub>2</sub> <sup>d</sup></label>
+				<span class=""><input id = "b2"></input></span><br>
+				</p>
+				<!-- <a href = "javascript: void(0)" class="" id = "">Send</a> <br> -->
+				</div>
+			</div>
+			
+			<div class="meta-date">
+				<span class="data">&#918;<sub>u</sub><br>&nbsp; </span>
+				<span class="date">&larr; </span>
+			</div>
+		</div>
+		<!-- // Article -->
+
+		<!-- Article -->
+		<div class="timeline-article">
+			<div class="content-right-container">
+			<div class="content-right">
+			<p class = "sp">
+			   Pre-set parameters: <br>
+			   
+				t<sub>1</sub> = <span class=""><input id = "t1"></input></span><br>
+				t<sub>2</sub> = <span class=""><input id = "t2"></input></span><br>
+				t<sub>3</sub> = <span class=""><input id = "t3"></input></span><br>
+				t<sub>4</sub> = <span class=""><input id = "t4"></input></span><br>
+				t<sub>5</sub> = <span class=""><input id = "t5"></input></span><br>
+				
+				<hr>
+				<a href = "javascript: void(0)" class="" id = "userExecuteThree">Execute</a><br><br>
+				<label class="textdescription"><button id="button" style = "display:none" >Set</button> m = </label><span class=""><input id = "m"></input></span>
+				
+				<br>
+				<label class="textdescription">&#950;<sub>1</sub> = z<sub>1</sub><sup>&#955;</sup> = </label><span class=""><input id = "zeta1"></input></span><br>
+			    <label class="textdescription">&#950;<sub>2</sub> = z/&#950;<sub>1</sub> =  </label><span class=""><input id = "zeta2"></input></span><br>
+				<label class="textdescription">&#945; = a g<sup>t<sub>1</sub></sup> y <sup>t<sub>2</sub></sup> = </label><span class=""><input id = "alpha"></input></span><br>
+				<label class="textdescription">&#946;<sub>1</sub> = b<sub>1</sub><sup>&#955;</sup> g <sup>t<sub>3</sub></sup> &#950;<sub>1</sub> <sup>t<sub>5</sub></sup> = </label><span class=""><input id = "beta1"></input></span><br>
+				<label class="textdescription">&#946;<sub>2</sub> = b<sub>2</sub><sup>&#955;</sup> h <sup>t<sub>4</sub></sup> &#950;<sub>2</sub> <sup>t<sub>5</sub></sup> = </label><span class=""><input id = "beta2"></input></span><br>
+				<label class="textdescription">&#949; = H<sub>2</sub>(&#950;<sub>1</sub> | &#945; | &#946;<sub>1</sub> | &#946;<sub>1</sub> | m ) = </label><span class=""><input id = "epsilon"></input></span><br>
+				<label class="textdescription">e = (&#949; - t<sub>2</sub> - t<sub>5</sub> ) mod q </label><span class=""><input id = "e"></input></span><br>
+			</p>
+			</div>
+			<!-- <span class="timeline-author">John Doe</span> -->
+			</div>
+			
+			<div class="meta-date">
+			    <span class="data"> z<sub>1</sub>, a, <br> b<sub>1</sub>, b<sub>2</sub></span>
+				<span class="date">&rarr;</span>
+			</div>
+		</div>
+      <!-- // Article -->
+      
+      <!-- Article -->
+		<div class="timeline-article">
+			<div class="content-left-container">
+				<div class="content-left">
+				<p class = "sp">
+				<a href = "javascript: void(0)" class="" id = "issuerExecuteFour">Execute</a><br>
+				<label class="textdescription">c = (e - d) mod q = </label><span class=""><input id = "c"></input></span><br>
+				<label class="textdescription">r = (&#956; - cx) mod q = </label><span class=""><input id = "r"></input></span><br>
+				</p><br>
+				<!-- <a href = "javascript: void(0)" class="" id = "">Send</a> -->
+				</div>
+			</div>
+			
+			<div class="meta-date">
+			    <span class="data">e <br> &nbsp;</span>
+				<span class="date">&larr;</span>
+			</div>
+		</div>
+		<!-- // Article -->
+		
+			<!-- Article -->
+		<div class="timeline-article">
+			<div class="content-right-container">
+			<div class="content-right">
+			<p class = "sp">
+				<a href = "javascript: void(0)" class="" id = "userExecuteFive">Execute</a><br>
+				<label class="textdescription">&#961; = (r + t<sub>1</sub>) mod q = </label> <span class=""><input id = "rho"></input></span><br>
+				<label class="textdescription">&#969; = (c + t<sub>2</sub>) mod q = </label> <span class=""><input id = "omega"></input></span><br>
+				<label class="textdescription">&#963;<sub>1</sub> = (&#955;s<sub>1</sub>+ t<sub>3</sub>) mod q = </label> <span class=""><input id = "sigma1"></input></span><br>
+				<label class="textdescription">&#963;<sub>2</sub> = (&#955;s<sub>2</sub> + t<sub>4</sub>) mod q = </label> <span class=""><input id = "sigma2"></input></span><br>
+				<label class="textdescription">&#948; = (d + t<sub>5</sub>) mod q = </label> <span class=""><input id = "delta"></input></span><br>
+			</p>
+			</div>
+			<!-- <span class="timeline-author">John Doe</span> -->
+			
+			</div>
+			<div class="meta-date">
+			<span class="data">r, c, <br> s<sub>1</sub>, s<sub>2</sub>, d </span>
+			<span class="date">&rarr;</span>
+			</div>
+		</div>
+      <!-- // Article -->
+    
+    <hr>  
+    <!-- Article -->
+	<div class="timeline-article">
+		<div class="content-left-container">
+			<div class="content-left">
+			<p class = "sp">
+			<a href = "javascript: void(0)" class="" id = "issuerExecuteSix">Execute</a><br>
+			The issuer store &#958; <sup>&#965;</sup> as a source of the user. where &#958; is the public key of a user, &#965; is selected and known by the issuer.
+			<ul>
+			  <li>User's name: <br> <input id = "username" value = "" style = "border-bottom: 0px"></input></li>
+			  <li>User's public key : <br>  <input id = "upk" value = "" style = "border-bottom: 0px" ></input> <input id = "contractAddress" type = "hidden" value = ""></input></li>
+			  <li>User's identity  &#958; <sup>&#965;</sup>: <br>  <input id = "identity" style = "border-bottom: 0px"></input></li>
+			</ul>
+			</p>
+			</div>
+		</div>
+
+		<div class="content-right-container">
+		<div class="content-right">
+		<p class = "sp">
+			Please chick <a href = "javascript: void(0)" class="" id = "button1" >here</a> to see a full version of user's credential. Even the user gives this credential to an issuer, the issuer can not 
+			connect it to the source of the user without the help of the blockchain.
+		    <ul>
+		      <li>User's name: <br> <input id = "username1" value = "" style = "border-bottom: 0px"></input></li>
+		      <li>Issuer's public key: <br> <input id = "ipk1" value = "" style = "border-bottom: 0px"></input></li>
+			  <li>User's Credential  &#950;<sub>1</sub>:  <input id = "zeta_1" style = "border-bottom: 0px" ></input>  
+			  </li>
+			</ul>
+		</p> 
+		</div>
+		</div>
+		
+		<div class="meta-date" style = "background:#9c27b0">
+		    <span class="data">&nbsp; <br> &nbsp;</span>
+			<span class="date" style = "font-size: 23px">blind</span>
+		</div>
+		
+	</div>
+    <!-- // Article -->
+      
+      
+
+    </div> 
+    <!-- <div class="timeline-end">End</div> -->
+  </section>
+  <!-- // Vertical Timeline -->
+  
+<div class="ca-popup" id="ca-popup-1">
+  <div class="ca-popup-content">
+    <span class="ca-exout">&times;</span>
+    <div class="ca-part">
+      <h1>Credential Examples</h1>
+      <h2>Please fill out the information below and <b>submit</b> this form</h2>
+    </div>
+    <img src="../static/img/frog1.png" class="ca-cover">
+    <div class="ca-part">
+     <!--  <img class="ca-subscribe" src="../static/img/button.png">
+      <img class="ca-logo" src="../static/img/logo.png"> -->
+      <br> 
+      <br> <br> 
+      <label class="textdescription"> Name: </label><span class=""><input id = "name1" value="Mr Frog"></input></span><br> 
+      <label class="textdescription"> Age: </label><span class=""><input id = "age1" value="28"></input></span><br> 
+      <label class="textdescription"> Birthday: </label><span class=""><input id = "birthday1" value="1991-08-17"></input></span><br> 
+      <label class="textdescription"> Nationality: </label><span class=""><input id = "nationality1" value="China"></input></span><br> 
+      <label class="textdescription"> Gender: </label><span class=""><input id = "gender1" value="Man"></input></span><br> 
+      <label class="textdescription"> Address: </label><span class=""><input id = "address1" value="Jiangsu Province"></input></span><br> <br> <br> 
+      <label for="description"><button id="submitmsg" class = "myButton" title="">Submit</button></label>
+      
+      <!-- <p>*This is the fine text that no one reads and if you do it will make you cringe a little because it
+        is so long and boring and benefits you in no way possible, therefor I will just keep ranting on about how
+        terrible fine print is, oh wait, no I wont.</p> -->
+    </div>
+  </div>
+</div>
+
+
+<div class="ca-popup" id="ca-popup-2">
+  <div class="ca-popup-content">
+    <span class="ca-exout">&times;</span>
+    <div class="ca-part">
+      <h1>Mr Frog's Credential</h1>
+    </div>
+    
+    <img src="../static/img/frog1.png" class="ca-cover">
+    <div class="ca-part">
+      <br>
+     <!--  <img class="ca-subscribe" src="../static/img/button.png">
+      <img class="ca-logo" src="../static/img/logo.png"> -->
+      <label class="textdescription"> Name: </label><span class=""><input id = "name2"  ></input></span><br> 
+      <label class="textdescription"> Age: </label><span class=""><input id = "age2"></input></span><br> 
+      <label class="textdescription"> Birthday: </label><span class=""><input id = "birthday2"></input></span><br> 
+      <label class="textdescription"> Nationality: </label><span class=""><input id = "nationality2"></input></span><br> 
+      <label class="textdescription"> Gender: </label><span class=""><input id = "gender2"></input></span><br> 
+      <label class="textdescription"> Address: </label><span class=""><input id = "address2"></input></span>
+      
+      <hr>
+      
+      <label class="textdescription"> Issuer's PK = </label><span class=""><input id = "ipk"></input></span> <br>
+      Signature = ( &#950;<sub>1</sub> || g<sup>&#961;</sup> y <sup>&#969;</sup> || g<sup>&#963;<sub>1</sub></sup> &#950;<sub>1</sub> <sup>&#948;</sup>
+      || h<sup>&#963;<sub>2</sub></sup> &#950;<sub>2</sub> <sup>&#948;</sup> )
+      <br><br><br>
+      <!-- <label class="textdescription">&#961; = </label> <span class=""><input id = "rho"></input></span><br>
+	  <label class="textdescription">&#969; = </label> <span class=""><input id = "omega"></input></span><br>
+	  <label class="textdescription">&#963;<sub>1</sub> = </label> <span class=""><input id = "sigma1"></input></span><br>
+	  <label class="textdescription">&#963;<sub>2</sub> = </label> <span class=""><input id = "sigma2"></input></span><br>
+	  <label class="textdescription">&#948; = </label> <span class=""><input id = "delta"></input></span><br> -->
+      
+      <p>g, h are generators of subgroup of order q in Z<sub>p</sub><sup>*</sup>, which are publicly to each entity.
+      &#961; &nbsp;,&#969;&nbsp;,&#963;<sub>1</sub>&nbsp;,&#963;<sub>2</sub>&nbsp;,&#948; is known to the user.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="copyright">
+        <p>&copy; Copyright 2019 Rujia. All Rights Reserved</p>
+</div>
+
+</body>
+</html>
