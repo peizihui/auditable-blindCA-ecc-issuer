@@ -8,7 +8,7 @@ Auditable-blindCA-demo issues certificates blindly and reveals the blindness by 
 
 1. First ensure you have Docker installed. [See Docker installation help](https://docs.docker.com/install/).
 
-2. From a command line in cert-issuer dir, build your docker container:
+2. From a command line below, build your Docker container:
     
     ```
     docker pull rujia/contract-kit:v14.
