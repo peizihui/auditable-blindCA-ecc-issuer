@@ -11,7 +11,7 @@ Auditable-blindCA-demo issues certificates blindly and reveals the blindness by 
 2. From a command line below, build your Docker container:
     
     ```
-    docker pull rujia/contract-kit:v14.
+    docker pull rujia/contract-kit:v15.
     ```
 
     This image will expose port 8080 and 8081 inside the container and receive web requests, passing different requests to issuing service and tracing service respectively.
