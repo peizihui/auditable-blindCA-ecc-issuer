@@ -19,7 +19,7 @@ Auditable-blindCA-demo issues certificates blindly and reveals the blindness by 
 ### Running the Docker
 
     ```
-    docker run -t -i -p 8080:8080 -p 8081:8081 rujia/contract-kit:v14.
+    docker run -t -i -p 8080:8080 -p 8081:8081 rujia/contract-kit:v15.
     ```
 
 ### Starting  the services
