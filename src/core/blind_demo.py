@@ -2,137 +2,67 @@
 #website:www.rujia.uk
 #version:1.0
 
-import os
+from charm.toolbox.ecgroup import ECGroup,G,ZR
+from charm.toolbox.eccurve import secp160k1,secp192k1,secp256k1
 from collections import namedtuple
 import hashlib
-import sys
-import traceback
+from flask import session
+from charm.core.engine.util import objectToBytes, bytesToObject
 
-Parameters = namedtuple('Parameters', ['L', 'N', 'p', 'q', 'g', 'h'])
-IssuerKeypair = namedtuple('IssuerKeypair', ['x', 'y', 'parameters'])
-UserKeypair = namedtuple('UserKeypair', ['gamma', 'xi', 'parameters'])
+
+Parameters = namedtuple('Parameters', ['secp', 'group', 'g', 'h'])
+IssuerKeypair = namedtuple('IssuerKeypair', ['x', 'y'])
+UserKeypair = namedtuple('UserKeypair', ['gamma', 'xi'])
 TracerKeypair = namedtuple('TracerKeypair', ['xt', 'yt', 'parameters'])
 
-### Math helper functions ###
-def rand_int(nbits):
-    if nbits % 8 != 0:
-        raise ValueError("nbits must be divisible by 8 so it can be broken"
-                         " into bytes.")
-    return int.from_bytes(os.urandom(nbits//8), byteorder='little')
+def choose_parameters_secp256k1():
+    group = ECGroup(secp256k1)
+    g, h = group.random(G), group.random(G)
+    parameters = Parameters(type, group, g, h)
+    return parameters
 
+def choose_parameters_secp192k1():
+    group = ECGroup(secp192k1)
+    g, h = group.random(G), group.random(G)
+    parameters = Parameters(type, group, g, h)
+    return parameters
 
-def rand_less_than(upper_bound, nbits):
-    '''This could be smarter.'''
-    while True:
-        r = rand_int(nbits)
-        if r < upper_bound:
-            return r
+def choose_parameters_secp160k1():
+    group = ECGroup(secp160k1)
+    g, h = group.random(G), group.random(G)
+    parameters = Parameters(type, group, g, h)
+    return parameters
 
+def point2Obj(x, group):
+    import binascii
+    temp_str = hex(x)[2:]
+    dict_ecc = {708: 42,
+                711: 48,
+                714: 64}
+    temp_str = (dict_ecc[group.groupType()] - len(temp_str)) * '0' + temp_str
+    return group.encode(binascii.a2b_hex(temp_str), include_ctr=True)
 
-def fermat_test(p, nbits):
-    '''Fermat primality test'''
-    for _ in range(5):
-        a = rand_less_than(p, nbits)
-        if not pow(a, p - 1, p) == 1:
-            return False
-    return True
+def issuer_choose_keypair(group,orig_g):
+    x = group.random(ZR)
+    y = orig_g ** x
+    return IssuerKeypair(x,y)
 
+def user_choose_keypair(group,orig_g):
+    gamma = group.random(ZR)
+    xi = orig_g ** gamma
+    return UserKeypair(gamma, xi)
 
-def miller_rabin_test(p, nbits):
-    '''Miller-Rabin primality test'''
-    k = 5  # accuracy parameter, this should be turned up in practice
-    r = 1
-    while (pow(2, r) & p) != pow(2, r):
-        r += 1
-    d = p // pow(2, r)
-    for _ in range(k):
-        a = rand_less_than(p - 2, nbits)
-        x = pow(a, d, p)
-        if x == 1 or x == p - 1:
-            continue
-        for _ in range(r - 1):
-            x = pow(x, 2, p)
-            if x == 1:
-                return False
-            if x == p - 1:
-                break
-        else:
-            return False
-    return True
+def get_random_ZR(group):
+    random = group.random(ZR)
+    return random
 
+def tracer_choose_keypair(group,orig_g):
+    xt = group.random(ZR)
+    yt = orig_g ** xt
+    return UserKeypair(xt, yt)
 
-def prime_test(p, nbits):
-    return miller_rabin_test(p, nbits)
-
-
-def rand_prime(nbits):
-    is_prime = False
-    while not is_prime:
-        p = rand_int(nbits)
-        is_prime = prime_test(p, nbits)
-    return p
-
-
-### DSA functions ###
-def choose_q(N):
-    return rand_prime(N)
-
-
-def choose_p(L, N, q):
-    k = L - N
-    is_prime = False
-    while not is_prime:
-        p = (q*rand_int(k)) + 1
-        is_prime = prime_test(p, L)
-    return p
-
-
-def choose_g(L, N, p, q):
-    h = 2
-    while True:
-        g = pow(h, (p - 1)//q, p)
-        if pow(g, q, p) == 1:
-            return g
-        h = rand_less_than(p, L)
-
-
-def choose_parameters(L, N):
-    '''Returns DSA parameters p, q, g'''
-    q = choose_q(N)
-    p = choose_p(L, N, q)
-    #p1 = choose_p(L, N, q)
-    
-    g = choose_g(L, N, p, q)
-    #h = choose_g(L, N, p1, q)
-    
-    h = g
-    
-    return Parameters(L, N, p, q, g, h)
-
-def issuer_choose_keypair(parameters):
-    x = rand_less_than(parameters.q, parameters.N)
-    y = pow(parameters.g, x, parameters.p)
-    return IssuerKeypair(x,y,parameters)
-
-def user_choose_keypair(parameters):
-    gamma = rand_less_than(parameters.q, parameters.N)
-    xi = pow(parameters.g, gamma, parameters.p)
-    print(parameters.g)
-    print(gamma)
-    print(parameters.p)
-    print(xi)
-    return UserKeypair(gamma, xi, parameters)
-
-def tracer_choose_keypair(parameters):
-    xt = rand_less_than(parameters.q, parameters.N)
-    yt = pow(parameters.g, xt, parameters.p)
-    return TracerKeypair(xt,yt,parameters)
-
-def gnerate_common_z(parameters,h,y):
-    h_hash = full_domain_hash(int_to_bytes(parameters.p) + int_to_bytes(parameters.q) + int_to_bytes(parameters.g) +
-                                int_to_bytes(h) + int_to_bytes(y), parameters.L)
-    i = int.from_bytes(h_hash, byteorder='little') % parameters.p
-    return pow(i, (parameters.p - 1)//parameters.q, parameters.p)
+def gnerate_common_z(group,g,h,y):
+    return group.hash((g, h, y), G)
 
 def int_to_bytes(in_int):
     i = in_int
@@ -164,10 +94,10 @@ def digest(data, parameters):
 ### Protocol stuff ###
 class Issuer:
     '''Issuer S from the paper'''
-    def __init__(self, L,N,p,q,g,h,x,y,parameters):
+    def __init__(self, g,h,x,y,parameters):
         self.parameters = parameters
-        self.L, self.N, self.p, self.q, self.g, self.h = L,N,p,q,g,h
-        self.IssuerKeypair = IssuerKeypair(x, y, parameters)
+        self.g, self.h = g,h
+        self.IssuerKeypair = IssuerKeypair(x, y)
         
         #self.IssuerKeypair = IssuerKeypair(x,y,parameters)
         
@@ -211,10 +141,10 @@ class Issuer:
 
 class User:
     '''User U from the paper'''
-    def __init__(self,L,N,p,q,g,h,gamma,xi,parameters):
+    def __init__(self,g,h,gamma,xi,parameters):
         self.parameters = parameters
-        self.L, self.N, self.p, self.q, self.g, self.h = L,N,p,q,g,h
-        self.UserKeypair = UserKeypair(gamma, xi, parameters)
+        self.g, self.h = g,h
+        self.UserKeypair = UserKeypair(gamma, xi)
         
     def start(self, t1, t2, t3, t4, t5, z, y):
         self.t1, self.t2, self.t3, self.t4,self.t5 = t1, t2, t3, t4, t5
@@ -222,13 +152,8 @@ class User:
         self.y = y
         
     def protocol_one(self):
-        
-        ngama = pow(self.UserKeypair.gamma, self.q - 2, self.q)
-        self.zu = pow(self.z, ngama, self.p)
-        
-        #print((ngama * self.UserKeypair.gamma) % self.q)
-        
-        return self.zu,self.UserKeypair.xi
+        self.z_u = self.z ** (self.UserKeypair.gamma ** -1)
+        return (self.z_u, self.UserKeypair.xi)
 
     def protocol_three(self, z1, a, b1, b2, m):
         
@@ -314,6 +239,18 @@ def identity_tracing(zeta1, xt, upsilon ,parameters):
     #print(user.zeta1)
     return ide == pow(user.UserKeypair.xi, upsilon, parameters.p)
 
+# tools
+def getObjFromSession(key, group):
+    value_bytes = session.get(key)
+    orig_value = bytesToObject(value_bytes, group)
+    return orig_value
+
+def putBytesToSession(key, value, group):
+    value_bytes = objectToBytes(value, group)
+    session[key] = value_bytes
+
+
+
 if __name__ == '__main__':
     #L, N = 1024, 160
     L, N = 256, 40
@@ -321,7 +258,7 @@ if __name__ == '__main__':
     m = b'my msg'
     
     # prepare the params of 'p', 'q', 'g'
-    params = choose_parameters(L, N)
+    params = choose_parameters_secp256k1(L, N)
     
     # get the tracer 's public key 
     tracerKeypair = tracer_choose_keypair(params)
@@ -361,31 +298,3 @@ if __name__ == '__main__':
 #     print( % user.p == ( % user.p)) 
     
 #     print((((pow(user.h, ((user.UserKeypair.gamma)*s2) + user.t4, user.p))* pow(issuer.z2, (user.UserKeypair.gamma) * d, user.p))) % user.p)
-    
-    try:
-        # p has proper form
-        assert (params.p - 1) % params.q == 0
-        # requirement to use this F
-        assert ((params.p - 1) % params.q**2) != 0
-        # test params are prime
-        assert prime_test(params.p, params.L)
-        assert prime_test(params.q, params.N)
-        # g has proper form
-        assert pow(params.g, params.q, params.p) == 1
-        # z is in g
-        assert pow(user.z, params.q, params.p) == 1
-        # signature works
-        assert verify(rho, omega, delta, sigma1, sigma2, user.h, m, user.y, user.zeta1,user.zeta2, user.z, params)
-        
-        assert credential_tracing(xi, issuer.upsilon, xt, params)
-        
-        assert identity_tracing(user.zeta1, xt, issuer.upsilon ,params)
-
-    except AssertionError:
-        _, _, tb = sys.exc_info()
-        traceback.print_tb(tb) # Fixed format
-        tb_info = traceback.extract_tb(tb)
-        filename, line, func, text = tb_info[-1]
-    
-        print('An error occurred on line {} in statement {}'.format(line, text))
-        exit(1)

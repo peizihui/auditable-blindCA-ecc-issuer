@@ -1,161 +1,240 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
+# author:rujia
+# website:www.rujia.uk
+# version:1.0
 
-#author:rujia
-#website:www.rujia.uk
-#version:1.0
-
-from flask import request,session,json,render_template
+from flask import request, session, json, render_template
 from . import app
-#from . import db
 from core import blind_demo
-
+#from charm.core.engine.util import objectToBytes, bytesToObject
+from pip._vendor.six import int2byte
+from charm.toolbox.ecgroup import ECGroup,G,ZR
+from charm.toolbox.eccurve import secp160k1,secp192k1,secp256k1
+from charm.toolbox.conversion import Conversion
+from charm.core.math.elliptic_curve import elliptic_curve,ec_element
 
 
 @app.route('/')
 def default():
-	return render_template('/index.html')
+    return render_template('/index.html')
+
 
 @app.route('/index')
 def index():
-	return render_template('/index.html')
+    return render_template('/index.html')
+
 
 @app.route('/index_register')
 def index_register():
-	return render_template('/index_register.html')
+    return render_template('/index_register.html')
+
 
 @app.route('/tracing')
 def tracing():
-	return render_template('tracing.html')
+    return render_template('tracing.html')
 
-@app.route("/init", methods=['GET'])
+
+@app.route('/init', methods=['GET'])
 def init():
-	try:
-			#L = session.get('L')
-			#N = session.get('N')
-			p = session.get('p')
-			q = session.get('q')
-			g = session.get('g')
-			
-			x = session.get('x')
-			y = session.get('y')
-			h = session.get('h')
-			z = session.get('z')
-			
-			xi = session.get('xi')
-			gamma = session.get('gamma')
-			
-			rjson = str(p) + ',' + str(q) + ',' + str(g) + ',' + str(x) + ',' + str(y) + ',' + str(h) + ',' + str(z) + ',' + str(xi) + ',' + str(gamma) 
-			
-			return rjson
-	except Exception:
-		return "0"
+    try:
+        p = session.get('p')
+        a = session.get('a')
+        b = session.get('b')
+        n = session.get('n')
 
-@app.route("/setup", methods=['POST'])
+        gx = session.get('gx')
+        gy = session.get('gy')
+        hx = session.get('hx')
+        hy = session.get('hy')
+        
+        
+        
+        secp = session['secp']
+        
+        if secp == 'secp256k1':
+            params = blind_demo.choose_parameters_secp256k1()
+        elif secp == 'secp192k1':
+            params = blind_demo.choose_parameters_secp192k1()
+        elif secp == 'secp160k1':
+            params = blind_demo.choose_parameters_secp160k1()
+        
+        
+        orig_x = blind_demo.getObjFromSession('x_bytes',params.group)
+        orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
+        orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
+        orig_gamma = blind_demo.getObjFromSession('gamma_bytes',params.group)
+        orig_xi = blind_demo.getObjFromSession('xi_bytes',params.group)
+        
+
+
+        rjson = str(p) + '#' + str(a) + '#' + str(b) + '#' + str(n) + '#' + str(gx) + '#' + str(gy) + '#' + str(hx) + '#' + str(hy) \
+        + '#' + str(secp) + "#" + str(orig_x) + '#' + str(orig_y) + '#' + str(orig_z) + '#' + str(orig_gamma) + '#' + str(orig_xi)
+
+        return rjson
+    except Exception:
+        return '0'
+
+
+@app.route('/setup', methods=['POST'])
 def setup():
-	try:
-			session.clear()
-			
-			L = int(request.form['L'])
-			N = int(request.form['N'])
-			params = blind_demo.choose_parameters(L,N)
-			
-			session['L'] = L
-			session['N'] = N
-			session['p'] = params.p
-			session['q'] = params.q
-			session['g'] = params.g
-			session['h'] = params.h
-			
-			rjson = json.dumps(params)
-			
-			return rjson
-	except Exception:
-		return "0"
+    try:
+        session.clear()
 
-@app.route("/issuerkey", methods=['POST'])
+        secp = str(request.form['secp'])
+
+        (
+            p,
+            a,
+            b,
+            n,
+            gx,
+            gy,
+            hx,
+            hy,
+            ) = (
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            )
+
+        if secp == 'secp256k1':
+            params = blind_demo.choose_parameters_secp256k1()
+            p = 115792089237316195423570985008687907853269984665640564039457584007908834671663
+            a = 0
+            b = 7
+            n = 115792089237316195423570985008687907852837564279074904382605163141518161494337
+            gx = params.group.coordinates(params.g)[0]
+            gy = params.group.coordinates(params.g)[1]
+            hx = params.group.coordinates(params.h)[0]
+            hy = params.group.coordinates(params.h)[1]
+            secp = 'secp256k1'
+        elif secp == 'secp192k1':
+
+            params = blind_demo.choose_parameters_secp192k1()
+            p = 6277101735386680763835789423207666416102355444459739541047
+            a = 0
+            b = 3
+            n = 6277101735386680763835789423061264271957123915200845512077
+            gx = params.group.coordinates(params.g)[0]
+            gy = params.group.coordinates(params.g)[1]
+            hx = params.group.coordinates(params.h)[0]
+            hy = params.group.coordinates(params.h)[1]
+            secp = 'secp192k1'
+        elif secp == 'secp160k1':
+            params = blind_demo.choose_parameters_secp160k1()
+            p = 1461501637330902918203684832716283019651637554291
+            a = 0
+            b = 7
+            n = 1461501637330902918203686915170869725397159163571
+            gx = params.group.coordinates(params.g)[0]
+            gy = params.group.coordinates(params.g)[1]
+            hx = params.group.coordinates(params.h)[0]
+            hy = params.group.coordinates(params.h)[1]
+            secp = 'secp160k1'
+        
+        blind_demo.putBytesToSession('g_bytes',params.g, params.group)
+        blind_demo.putBytesToSession('h_bytes',params.h, params.group)
+        
+        session['p'] = p
+        session['a'] = a
+        session['b'] = b
+        session['n'] = n
+        session['gx'] = str(gx)
+        session['gy'] = str(gy)
+        session['hx'] = str(hx)
+        session['hy'] = str(hy)
+        session['secp'] = secp
+
+        rjson = str(p) + ',' + str(a) + ',' + str(b) + ',' + str(n) + ',' + str(gx) + ',' + str(gy) + ',' + str(hx) + ',' + str(hy)
+        return rjson
+    except Exception:
+        return '0'
+
+
+# def getX(parax):
+# ....parax = str(parax)
+# ....parax = parax.split(',')[0]
+# ....parax = parax[1:len(parax)]
+# ....return parax
+
+# def getY(paray):
+# ....paray = str(paray)
+# ....paray = paray.split(',')[1]
+# ....paray = paray[1:len(paray)-1]
+# ....return paray
+
+@app.route('/issuerkey', methods=['POST'])
 def issuerkey():
-	try:
-			L = session.get('L')
-			N = session.get('N')
-			p = session.get('p')
-			q = session.get('q')
-			g = session.get('g')
-			h = session.get('h')
-			
-			params = blind_demo.Parameters(L, N, p, q, g, h)
-			
-			issuerparams = blind_demo.issuer_choose_keypair(params)
-			
-			x = issuerparams.x
-			y = issuerparams.y
-			session['x'] = x
-			session['y'] = y
-			
-			z = blind_demo.gnerate_common_z(params, h, y)
-			session['z'] = z
-			
-			#tracerparams = blind_demo.tracer_choose_keypair(params)
-			#xt = tracerparams.xt
-			#yt = tracerparams.yt
-			
-			
-			## set the tracer's private key and public key
-			#session['xt'] = xt
-			#session['yt'] = yt
+    try:
+        secp = session['secp']
+        
+        if secp == 'secp256k1':
+            params = blind_demo.choose_parameters_secp256k1()
+        elif secp == 'secp192k1':
+            params = blind_demo.choose_parameters_secp192k1()
+        elif secp == 'secp160k1':
+            params = blind_demo.choose_parameters_secp160k1()
+        
+        orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
+        orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
 
-			#upsilon = 1131744774912427240787421411389040568170382216
-			#mu = 323113775694352543177133061757687809309917194147
-			#s1 = 80265387361124049999679494046599184323218995737
-			#s2 = 363145392284651453379471000225041771070074440315
-			#d = 276662341117674262269660624603213684542129423868
-			
-			session['upsilon'] = blind_demo.rand_less_than(params.q, params.N)
-			session['mu'] = blind_demo.rand_less_than(params.q, params.N)
-			session['d'] = blind_demo.rand_less_than(params.q, params.N)
-			session['s1'] = blind_demo.rand_less_than(params.q, params.N)
-			session['s2'] = blind_demo.rand_less_than(params.q, params.N)
-			
-			rjson = str(x) + ',' + str(y)  + ',' + str(z)
-			
-			return rjson
-	except Exception:
-		return "0"
+        issuerparams = blind_demo.issuer_choose_keypair(params.group,orig_g)
 
-@app.route("/userkey", methods=['POST'])
+        x = issuerparams.x
+        y = issuerparams.y
+        
+        blind_demo.putBytesToSession('x_bytes',x, params.group)
+        blind_demo.putBytesToSession('y_bytes',y, params.group)
+
+        z = blind_demo.gnerate_common_z(params.group, orig_g, orig_h, y)
+        
+        blind_demo.putBytesToSession('z_bytes',z, params.group)
+        
+        rjson = str(x) + "#" + str(y) + "#" + str(z)
+        return rjson
+    except Exception:
+        return '0' 
+
+
+@app.route('/userkey', methods=['POST'])
 def userkey():
-	try:
-			L = session.get('L')
-			N = session.get('N')
-			p = session.get('p')
-			q = session.get('q')
-			g = session.get('g')
-			h = session.get('h')
-			params = blind_demo.Parameters(L, N, p, q, g, h)
-			
-			issuerparams = blind_demo.user_choose_keypair(params)
-			session['xi'] = issuerparams.xi
-			session['gamma'] = issuerparams.gamma
-			
-			t1 = blind_demo.rand_less_than(params.q, params.N)
-			t2 = blind_demo.rand_less_than(params.q, params.N)
-			t3 = blind_demo.rand_less_than(params.q, params.N)
-			t4 = blind_demo.rand_less_than(params.q, params.N)
-			t5 = blind_demo.rand_less_than(params.q, params.N)
-			
-			#t1 = 53469262023230480563475615733216614368413001046
-			#t2 = 108250248297254881989205148547347791955729098453
-			#t3 = 378917074496268035816520047086947221659871012331
-			#t4 = 133459743642956919437859148575716353228269709357
-			#t5 = 7272773057241985420455995988200180650086327435
-			
-			session['t1'] = t1
-			session['t2'] = t2
-			session['t3'] = t3
-			session['t4'] = t4
-			session['t5'] = t5
-			
-			rjson = json.dumps(issuerparams)
-			
-			return rjson
-	except Exception:
-		return "0"
+    try:
+        secp = session['secp']
+
+        if secp == 'secp256k1':
+            params = blind_demo.choose_parameters_secp256k1()
+        elif secp == 'secp192k1':
+            params = blind_demo.choose_parameters_secp192k1()
+        elif secp == 'secp160k1':
+            params = blind_demo.choose_parameters_secp160k1()
+
+        orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
+
+        userparams = blind_demo.user_choose_keypair(params.group,orig_g)
+
+        xi = userparams.xi
+        gamma = userparams.gamma
+        
+        blind_demo.putBytesToSession('gamma_bytes',gamma, params.group)
+        blind_demo.putBytesToSession('xi_bytes',xi, params.group)
+        
+        blind_demo.putBytesToSession('t1_bytes',blind_demo.get_random_ZR(params.group), params.group)
+        blind_demo.putBytesToSession('t2_bytes',blind_demo.get_random_ZR(params.group), params.group)
+        blind_demo.putBytesToSession('t3_bytes',blind_demo.get_random_ZR(params.group), params.group)
+        blind_demo.putBytesToSession('t4_bytes',blind_demo.get_random_ZR(params.group), params.group)
+        blind_demo.putBytesToSession('t5_bytes',blind_demo.get_random_ZR(params.group), params.group)
+
+        rjson = str(gamma) + '#' + str(xi)
+        
+        print(rjson)
+
+        return rjson
+    except Exception:
+        return '0'

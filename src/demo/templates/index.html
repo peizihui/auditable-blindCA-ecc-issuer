@@ -9,11 +9,13 @@
   <!-- Fonts -->
   <link href='../static/fonts/roboto.css' rel='stylesheet' type='text/css'>
   <link href="../static/fonts/font.min.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
   <!-- // Fonts -->
   
   <script type="text/javascript" src= "../static/js/jquery.min.js"></script>
   <script type="text/javascript" src= "../static/js/index.js"></script>
   <script type="text/javascript" src= "../static/js/domain.js"></script>
+  
 
 </head>
 <body>
@@ -27,7 +29,7 @@
 		</li>
 
 		<li>
-		<p class="line">Issuing</p>
+		<p class="line">Issuing </p>
 		<a href = "issuing" id = "a_issuing"><span class="point"></span></a>
 		</li>
 
@@ -42,20 +44,28 @@
 		</li>
 		</ol>
 		</div>
-
-		1. Set up parameters &nbsp;&nbsp;&nbsp;&nbsp; <a href = "javascript: void(0)" class="" id = "setup">Set up</a> 
+        <b>Version: Elliptic Curve Cryptography <i class="fab fa-expeditedssl"></i> </b> <br> <br>
+		1. Set up parameters &nbsp;&nbsp;&nbsp;&nbsp;
+		<select name="jumpMenu" id="selectParam"> 
+		<option value="secp256k1">secp256k1</option> 
+		<option value="secp192k1">secp192k1</option> 
+		<option value="secp160k1">secp160k1</option>
+		</select> 
 		<hr>
 		<!-- Article -->
 		<div class="timeline-article">
 		<div class="content-left-container">
 		<div class="content-left"> 
 		<p><span class="article-number">Issuer</span>
-		
-		Set L, N = 256, 40  <br>
+		<label for="description">a = </label><span class=""><input id = "a1"></input></span><br>
+		<label for="description">b = </label><span class=""><input id = "b1"></input></span><br>
+		<label for="description">gx = </label><span class=""><input id = "gx1"></input></span><br>
+		<label for="description">gy = </label><span class=""><input id = "gy1"></input></span><br>
+		<label for="description">hx = </label><span class=""><input id = "hx1"></input></span><br> 
+		<label for="description">hy = </label><span class=""><input id = "hy1"></input></span><br> 
 		<label for="description">p = </label><span class=""><input id = "p1"></input></span><br>
-		<label for="description">q = </label><span class=""><input id = "q1"></input></span><br>
-		<label for="description">g = </label><span class=""><input id = "g1"></input></span><br>
-		<label for="description">h = </label><span class=""><input id = "h1"></input></span><br>
+		<label for="description">n = </label><span class=""><input id = "n1"></input></span><br>
+		<label for="description">h = </label><span class=""><input id = "h1" value = "1"></input></span><br>
 		</p>
 		</div>
 		<span class="timeline-author"></span>
@@ -64,12 +74,15 @@
 
 		<div class="content-right">
 		<p> <span class="article-number">User</span>
-		
-		Set L, N = 256, 40.<br>
+		<label for="description">a = </label><span class=""><input id = "a2"></input></span><br>
+		<label for="description">b = </label><span class=""><input id = "b2"></input></span><br>
+		<label for="description">gx = </label><span class=""><input id = "gx2"></input></span><br>
+		<label for="description">gy = </label><span class=""><input id = "gy2"></input></span><br>
+		<label for="description">hx = </label><span class=""><input id = "hx2"></input></span><br> 
+		<label for="description">hy = </label><span class=""><input id = "hy2"></input></span><br> 
 		<label for="description">p = </label><span class=""><input id = "p2"></input></span><br>
-		<label for="description">q = </label><span class=""><input id = "q2"></input></span><br>
-		<label for="description">g = </label><span class=""><input id = "g2"></input></span><br>
-		<label for="description">h = </label><span class=""><input id = "h2"></input></span><br>
+		<label for="description">n = </label><span class=""><input id = "n2"></input></span><br>
+		<label for="description">h = </label><span class=""><input id = "h2" value = "1"></input></span><br>
 		</p>
 		</div>
 
@@ -92,8 +105,8 @@
 		
 		Please click <a href = "javascript: void(0)" class="" id = "issuerkey">here</a> to generation issuer's public key and private key.<br>
 		<label class="textdescription">x <font color = "red">(private)</font> = </label> <span class=""><input id = "x"></input></span><br>
-		<label class="textdescription">y (public) = g<sup>x</sup> = </label>             <span class=""><input id = "y"></input></span><br>
-		<label class="textdescription">&#918; = &#919;<sub>1</sub>(p,q,g,h,y) = </label> <span class=""><input id = "z1"></input></span><br>
+		<label class="textdescription">y (public) = xP = </label>             <span class=""><input id = "y"></input></span><br>
+		<label class="textdescription">&#918; = &#919;<sub>1</sub>(g,h,y) = </label> <span class=""><input id = "z1"></input></span><br>
 		</p>
 		</div>
 
@@ -104,8 +117,8 @@
 		
 		Please click <a href = "javascript: void(0)" class="" id = "userkey">here</a> to generation user's public key and private key.<br>
 		<label class="textdescription">&#955; <font color = "red">(private)</font>  = </label><span class=""><input id = "gamma"></input></span><br>
-		<label class="textdescription">&#958; (public) = g<sup>&#955;</sup> = </label><span class=""><input id = "xi"></input></span><br>
-		<label class="textdescription">&#918; = &#919;<sub>1</sub>(p,q,g,h,y) = </label><span class=""><input id = "z2"></input></span><br>
+		<label class="textdescription">&#958; (public) = &#955;P = </label><span class=""><input id = "xi"></input></span><br>
+		<label class="textdescription">&#918; = &#919;<sub>1</sub>(g,h,y) = </label><span class=""><input id = "z2"></input></span><br>
 		</p>
 		</div>
 		<!-- <span class="timeline-author">John Doe</span> -->

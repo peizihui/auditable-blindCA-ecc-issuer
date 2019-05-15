@@ -6,6 +6,7 @@ from flask import session,request,render_template
 from . import app
 from core import blind_demo
 
+
 @app.route('/issuing')
 def issuing():
     yt = str(request.args.get('pk'))
@@ -18,17 +19,21 @@ def issuing():
 @app.route("/initgamma", methods=['GET'])
 def initgamma():
     try:
-            #xi = session.get('xi')
-            #gamma = session.get('gamma')
             
             # protocol one
-            z = session.get('z')
             user = getUserObj()
-            zu, xi = user.protocol_one()
-            session['zu'] = zu
-            y = session.get('y')
-            rjson1 = str(user.UserKeypair.gamma) + ',' + str(xi) + ',' + str(z) + ',' + str(zu) + ',' + str(y)
+            orig_gamma = blind_demo.getObjFromSession('gamma_bytes',user.parameters.group)
+            orig_z = blind_demo.getObjFromSession('z_bytes',user.parameters.group)
             
+            zu, xi = user.protocol_one()
+            
+            session['zu'] = str(zu)
+            print(zu)
+            y = session.get('y')
+            rjson1 = str(user.UserKeypair.gamma) + ',' + str(xi) + ',' + str(orig_z) + ',' + str(zu) + ',' + str(y)
+            
+            print(rjson1)
+            """
             # protocol two
             upsilon = session.get('upsilon')
             mu = session.get('mu')
@@ -89,8 +94,8 @@ def initgamma():
             xiupsilon = session.get('xiupsilon')
             
             rjson = rjson + ',' + str(contractAddress) + ',' + str(xiupsilon)
-            
-            return rjson
+            """
+            return rjson1
     except Exception:
         return "0"
     
@@ -224,20 +229,33 @@ def userExecuteFive():
 
 def getIssuerObj():
     try:
-            L = session.get('L')
-            N = session.get('N')
-            p = session.get('p')
-            q = session.get('q')
-            g = session.get('g')
-            h = session.get('h')
-           
-            params = blind_demo.Parameters(L, N, p, q, g, h)
+            
+            secp = session.get('secp')
+        
+            if secp == 'secp256k1':
+                params = blind_demo.choose_parameters_secp256k1()
+            elif secp == 'secp192k1':
+                params = blind_demo.choose_parameters_secp192k1()
+            elif secp == 'secp160k1':
+                params = blind_demo.choose_parameters_secp160k1()
+            
+            orig_gamma = blind_demo.getObjFromSession('gamma_bytes',params.group)
+            orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
+            orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
+            
             
             x = session.get('x')
             y = session.get('y')
-            yt = int(session.get('yt'))
+            
             z = session.get('z')
             
+            
+            tracerparams = blind_demo.tracer_choose_keypair(params.group,orig_g)
+            xt = tracerparams.yt
+            yt = tracerparams.yt
+            
+            session['xt'] = str(xt)
+            session['yt'] = str(yt)
             
             upsilon = session.get('upsilon')
             mu = session.get('mu')
@@ -245,45 +263,42 @@ def getIssuerObj():
             s1 = session.get('s1')
             s2 = session.get('s2')
             
-            #upsilon = 1131744774912427240787421411389040568170382216
-            #mu = 323113775694352543177133061757687809309917194147
-            #s1 = 80265387361124049999679494046599184323218995737
-            #s2 = 363145392284651453379471000225041771070074440315
-            #d = 276662341117674262269660624603213684542129423868
-            
-            issuer = blind_demo.Issuer(L,N,p,q,g,h,x,y,params)
+            issuer = blind_demo.Issuer(orig_g,orig_h,x,y,params)
             issuer.start(z,upsilon,mu,d,s1,s2, yt)
             
             return issuer
     except Exception:
         return None
     
+
     
 def getUserObj():
     try:
-            L = session.get('L')
-            N = session.get('N')
-            p = session.get('p')
-            q = session.get('q')
-            g = session.get('g')
-            h = session.get('h')
-            z = session.get('z')
             
-            params = blind_demo.Parameters(L, N, p, q, g, h)
+            secp = session.get('secp')
+        
+            if secp == 'secp256k1':
+                params = blind_demo.choose_parameters_secp256k1()
+            elif secp == 'secp192k1':
+                params = blind_demo.choose_parameters_secp192k1()
+            elif secp == 'secp160k1':
+                params = blind_demo.choose_parameters_secp160k1()
             
-            xi = session.get('xi')
-            gamma = session.get('gamma')
+            orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
+            orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
+            orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
+            orig_gamma = blind_demo.getObjFromSession('gamma_bytes',params.group)
+            orig_xi = blind_demo.getObjFromSession('xi_bytes',params.group)
             
-            t1 = session.get('t1')
-            t2 = session.get('t2')
-            t3 = session.get('t3')
-            t4 = session.get('t4')
-            t5 = session.get('t5')
+            orig_t1 = blind_demo.getObjFromSession('t1_bytes',params.group)
+            orig_t2 = blind_demo.getObjFromSession('t2_bytes',params.group)
+            orig_t3 = blind_demo.getObjFromSession('t3_bytes',params.group)
+            orig_t4 = blind_demo.getObjFromSession('t4_bytes',params.group)
+            orig_t5 = blind_demo.getObjFromSession('t5_bytes',params.group)
+            orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
             
-            y = session.get('y')
-            
-            user = blind_demo.User(L,N,p,q,g,h,gamma,xi,params)
-            user.start( t1, t2, t3, t4, t5, z, y)
+            user = blind_demo.User(orig_g,orig_h,orig_gamma,orig_xi,params)
+            user.start( orig_t1, orig_t2, orig_t3, orig_t4, orig_t5, orig_z, orig_y)
             
             return user
     except Exception:
