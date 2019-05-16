@@ -94,41 +94,35 @@ def digest(data, parameters):
 ### Protocol stuff ###
 class Issuer:
     '''Issuer S from the paper'''
-    def __init__(self, g,h,x,y,parameters):
+    def __init__(self, g, h, x, y,parameters):
         self.parameters = parameters
         self.g, self.h = g,h
         self.IssuerKeypair = IssuerKeypair(x, y)
         
-        #self.IssuerKeypair = IssuerKeypair(x,y,parameters)
-        
-    def start(self,z,upsilon,mu,d,s1,s2,yt):
+    def start(self,z,upsilon,mu,d,s1,s2):
         self.z = z
         self.upsilon = upsilon
         self.mu = mu
         self.d = d
         self.s1= s1
         self.s2= s2
-        self.tkey = yt
+        
+        
 
     def protocol_two(self,zu):
         
+        self.z1 = self.tkey ** self.upsilon
         
-        self.z1 = pow(self.tkey, self.upsilon,self.p)
+        self.z2 = zu / self.z1
         
-        self.a = pow(self.g, self.mu,self.p)
+        print(self.z2)
         
-        self.b1 = (pow(self.g, self.s1, self.p) *
-                  pow(self.z1, self.d, self.p)) % self.p
+        self.a = self.IssuerKeypair.parameters.g ** self.mu
         
-        #zud = pow(zu, self.d,self.p)
-        #nz1d = pow(pow(self.z1,(self.q)-1,self.p), self.d, self.p)
-        self.z2 = (zu * pow(self.z1,(self.q)-1,self.p)) % self.p
+        self.b1 = (self.IssuerKeypair.parameters.g ** self.s1) * (self.z1 ** self.d) 
         
-        self.b2 = (pow(self.h, self.s2, self.p) *
-                   pow(self.z2, self.d, self.p)
-                   ) % self.p
-                   
-        #print((self.z2 * self.z1) % self.p == zu)
+        self.b2 = (self.IssuerKeypair.parameters.h ** self.s2) * (self.z2 ** self.d)
+        
         return self.z1, self.a, self.b1, self.b2
 
     def protocol_four(self, e):
@@ -248,6 +242,7 @@ def getObjFromSession(key, group):
 def putBytesToSession(key, value, group):
     value_bytes = objectToBytes(value, group)
     session[key] = value_bytes
+
 
 
 

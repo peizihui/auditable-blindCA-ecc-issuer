@@ -89,16 +89,22 @@ $(function(){
 	$("#issuerExecuteTwo").click(function(){
 		$.get("issuerExecuteTwo",function(result) {
 			    var rstring=result.split(",");	
+			    $("#z1").val(rstring[0]);
+			    $("#z2").val(rstring[1]);
+			    $("#a").val(rstring[2]);
+			    $("#b1").val(rstring[3]);
+			    $("#b2").val(rstring[4]);
+		 });
+	})
+	
+	$("#setParamsTwo").click(function(){
+		$.get("setParamsTwo",function(result) {
+			    var rstring=result.split(",");	
 			    $("#upsilon").val(rstring[0]);
 			    $("#mu").val(rstring[1]);
 			    $("#s1").val(rstring[2]);
 			    $("#s2").val(rstring[3]);
 			    $("#d").val(rstring[4]);
-			    $("#z1").val(rstring[5]);
-			    $("#z2").val(rstring[6]);
-			    $("#a").val(rstring[7]);
-			    $("#b1").val(rstring[8]);
-			    $("#b2").val(rstring[9]);
 		 });
 	})
 	

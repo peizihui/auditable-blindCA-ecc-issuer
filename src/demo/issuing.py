@@ -22,15 +22,12 @@ def initgamma():
             
             # protocol one
             user = getUserObj()
-            orig_gamma = blind_demo.getObjFromSession('gamma_bytes',user.parameters.group)
             orig_z = blind_demo.getObjFromSession('z_bytes',user.parameters.group)
-            
             zu, xi = user.protocol_one()
+            blind_demo.putBytesToSession('zu_bytes',zu, user.parameters.group)
+            orig_y = blind_demo.getObjFromSession('y_bytes',user.parameters.group)
             
-            session['zu'] = str(zu)
-            print(zu)
-            y = session.get('y')
-            rjson1 = str(user.UserKeypair.gamma) + ',' + str(xi) + ',' + str(orig_z) + ',' + str(zu) + ',' + str(y)
+            rjson1 = str(user.UserKeypair.gamma) + ',' + str(xi) + ',' + str(orig_z) + ',' + str(zu) + ',' + str(orig_y)
             
             print(rjson1)
             """
@@ -103,22 +100,66 @@ def initgamma():
 @app.route("/issuerExecuteTwo", methods=['GET'])
 def issuerExecuteTwo():
     try:
-            zu = int(session.get('zu')) # assuming get from the user
             
             issuer = getIssuerObj()
-            issuer.protocol_two(zu)
+            orig_zu = blind_demo.getObjFromSession('zu_bytes',issuer.parameters.group)
             
-            session['z1'] = issuer.z1
-            session['z2'] = issuer.z2
-            session['a'] = issuer.a
-            session['b1'] = issuer.b1
-            session['b2'] = issuer.b2
-            session['d'] = issuer.d
-            session['mu'] = issuer.mu
-            session['s1'] = issuer.s1
-            session['s2'] = issuer.s2
+            print(123456)
             
-            rjson = str(issuer.upsilon) + ',' + str(issuer.mu) + ',' + str(issuer.s1) + ',' + str(issuer.s2) + ',' + str(issuer.d) + ',' + str(issuer.z1) + ',' + str(issuer.z2) + ',' + str(issuer.a) + ',' + str(issuer.b1)+ ',' + str(issuer.b2)
+            print(orig_zu)
+            
+            tracerparams = blind_demo.tracer_choose_keypair(issuer.parameters.group,issuer.g)
+            xt = tracerparams.yt
+            yt = tracerparams.yt
+            blind_demo.putBytesToSession('xt_bytes',xt, issuer.parameters.group)
+            blind_demo.putBytesToSession('yt_bytes',yt, issuer.parameters.group)
+            
+            issuer.protocol_two(orig_zu)
+            
+            blind_demo.putBytesToSession('z1_bytes',issuer.z1, issuer.parameters.group)
+            blind_demo.putBytesToSession('z2_bytes',issuer.z2, issuer.parameters.group)
+            blind_demo.putBytesToSession('a_bytes',issuer.a, issuer.parameters.group)
+            blind_demo.putBytesToSession('b1_bytes',issuer.b1, issuer.parameters.group)
+            blind_demo.putBytesToSession('b2_bytes',issuer.b2, issuer.parameters.group)
+            
+            
+            
+            rjson = str(issuer.z1) + ',' + str(issuer.z2) + ',' + str(issuer.a) + ',' + str(issuer.b1)+ ',' + str(issuer.b2)
+            
+            print(rjson)
+            
+            return rjson
+    except Exception as e:
+        print(e)
+        return "0"
+
+@app.route("/setParamsTwo", methods=['GET'])
+def setParamsTwo():
+    try:
+            
+            secp = session.get('secp')
+        
+            if secp == 'secp256k1':
+                params = blind_demo.choose_parameters_secp256k1()
+            elif secp == 'secp192k1':
+                params = blind_demo.choose_parameters_secp192k1()
+            elif secp == 'secp160k1':
+                params = blind_demo.choose_parameters_secp160k1()
+           
+            upsilon, mu, s1, s2, d = blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group)
+            
+            blind_demo.putBytesToSession('upsilon_bytes',upsilon, params.group)
+            blind_demo.putBytesToSession('mu_bytes',mu, params.group)
+            blind_demo.putBytesToSession('s1_bytes',s1, params.group)
+            blind_demo.putBytesToSession('s2_bytes',s2, params.group)
+            blind_demo.putBytesToSession('d_bytes',d, params.group)
+            
+            print(111111111)
+            print(session.get('mu_bytes'))
+            print(session.get('mu_bytes')!=None)
+            
+            
+            rjson = str(upsilon) + ',' + str(mu) + ',' + str(s1) + ',' + str(s2) + ',' + str(d)
             
             return rjson
     except Exception as e:
@@ -239,32 +280,43 @@ def getIssuerObj():
             elif secp == 'secp160k1':
                 params = blind_demo.choose_parameters_secp160k1()
             
-            orig_gamma = blind_demo.getObjFromSession('gamma_bytes',params.group)
             orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
             orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
             
+            orig_x = blind_demo.getObjFromSession('x_bytes',params.group)
+            orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
+            orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
             
-            x = session.get('x')
-            y = session.get('y')
+            print(session.get('mu_bytes'))
+            print(session.get('mu_bytes')!=None)
             
-            z = session.get('z')
+            if session.get('upsilon_bytes')!=None:
+                orig_upsilon = blind_demo.getObjFromSession('upsilon_bytes',params.group)
+                
+            if session.get('mu_bytes')!=None:
+                orig_mu = blind_demo.getObjFromSession('mu_bytes',params.group)
+                print(333333333333333333)
+                print(orig_mu)
+                
+            if session.get('d_bytes')!=None:
+                orig_d = blind_demo.getObjFromSession('d_bytes',params.group)
+                
+            if session.get('s1_bytes')!=None:
+                orig_s1 = blind_demo.getObjFromSession('s1_bytes',params.group)
+                
+            if session.get('s2_bytes')!=None:
+                orig_s2 = blind_demo.getObjFromSession('s2_bytes',params.group)
             
+            issuer = blind_demo.Issuer(orig_g,orig_h,orig_x,orig_y,params)
             
-            tracerparams = blind_demo.tracer_choose_keypair(params.group,orig_g)
-            xt = tracerparams.yt
-            yt = tracerparams.yt
+            print(orig_z)
+            print(orig_upsilon)
+            print(orig_mu)
+            print(orig_d)
+            print(orig_s1)
+            print(orig_s2)
             
-            session['xt'] = str(xt)
-            session['yt'] = str(yt)
-            
-            upsilon = session.get('upsilon')
-            mu = session.get('mu')
-            d = session.get('d')
-            s1 = session.get('s1')
-            s2 = session.get('s2')
-            
-            issuer = blind_demo.Issuer(orig_g,orig_h,x,y,params)
-            issuer.start(z,upsilon,mu,d,s1,s2, yt)
+            issuer.start(orig_z,orig_upsilon,orig_mu,orig_d,orig_s1,orig_s2)
             
             return issuer
     except Exception:
