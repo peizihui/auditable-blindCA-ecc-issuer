@@ -88,7 +88,7 @@ $(function(){
 	
 	$("#issuerExecuteTwo").click(function(){
 		$.get("issuerExecuteTwo",function(result) {
-			    var rstring=result.split(",");	
+			    var rstring=result.split("#");	
 			    $("#z1").val(rstring[0]);
 			    $("#z2").val(rstring[1]);
 			    $("#a").val(rstring[2]);
@@ -99,7 +99,7 @@ $(function(){
 	
 	$("#setParamsTwo").click(function(){
 		$.get("setParamsTwo",function(result) {
-			    var rstring=result.split(",");	
+			    var rstring=result.split("#");	
 			    $("#upsilon").val(rstring[0]);
 			    $("#mu").val(rstring[1]);
 			    $("#s1").val(rstring[2]);
@@ -125,7 +125,6 @@ $(function(){
 			    
 			    $("#username").val( $("#name1").val());
 			    
-			    
 			    var zeta1 = $("#zeta1").val();
 			    var upsilon = $("#upsilon").val();
 			    var xi = $("#xi").val();
@@ -144,6 +143,19 @@ $(function(){
 			modal.style.display = "block";
 			//return;
 		//}
+	})
+	
+	
+	
+	$("#setParamsThree").click(function(){
+		$.get("setParamsThree",function(result) {
+			    var rstring=result.split("#");	
+			    $("#t1").val(rstring[0]);
+			    $("#t2").val(rstring[1]);
+			    $("#t3").val(rstring[2]);
+			    $("#t4").val(rstring[3]);
+			    $("#t5").val(rstring[4]);
+		 });
 	})
 	
 	
@@ -230,16 +242,12 @@ onload = function () {
 			    $("#zeta1").val(rstring[0]);
 			    $("#zeta_1").val(rstring[0]);
 			    $("#zeta2").val(rstring[1]);
-			    $("#t1").val(rstring[2]);
-			    $("#t2").val(rstring[3]);
-			    $("#t3").val(rstring[4]);
-			    $("#t4").val(rstring[5]);
-			    $("#t5").val(rstring[6]);
-			    $("#alpha").val(rstring[7]);
-			    $("#beta1").val(rstring[8]);
-			    $("#beta2").val(rstring[9]);
-			    $("#epsilon").val(rstring[10]);
-			    $("#e").val(rstring[11]);
+			    
+			    $("#alpha").val(rstring[2]);
+			    $("#beta1").val(rstring[3]);
+			    $("#beta2").val(rstring[4]);
+			    $("#epsilon").val(rstring[5]);
+			    $("#e").val(rstring[6]);
 			    
 			    // change url address 
 			  

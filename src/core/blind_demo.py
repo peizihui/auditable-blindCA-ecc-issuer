@@ -13,7 +13,7 @@ from charm.core.engine.util import objectToBytes, bytesToObject
 Parameters = namedtuple('Parameters', ['secp', 'group', 'g', 'h'])
 IssuerKeypair = namedtuple('IssuerKeypair', ['x', 'y'])
 UserKeypair = namedtuple('UserKeypair', ['gamma', 'xi'])
-TracerKeypair = namedtuple('TracerKeypair', ['xt', 'yt', 'parameters'])
+TracerKeypair = namedtuple('TracerKeypair', ['xt', 'yt'])
 
 def choose_parameters_secp256k1():
     group = ECGroup(secp256k1)
@@ -59,7 +59,7 @@ def get_random_ZR(group):
 def tracer_choose_keypair(group,orig_g):
     xt = group.random(ZR)
     yt = orig_g ** xt
-    return UserKeypair(xt, yt)
+    return TracerKeypair(xt, yt)
 
 def gnerate_common_z(group,g,h,y):
     return group.hash((g, h, y), G)
@@ -115,19 +115,17 @@ class Issuer:
         
         self.z2 = zu / self.z1
         
-        print(self.z2)
+        self.a = self.parameters.g ** self.mu
         
-        self.a = self.IssuerKeypair.parameters.g ** self.mu
+        self.b1 = (self.parameters.g ** self.s1) * (self.z1 ** self.d) 
         
-        self.b1 = (self.IssuerKeypair.parameters.g ** self.s1) * (self.z1 ** self.d) 
-        
-        self.b2 = (self.IssuerKeypair.parameters.h ** self.s2) * (self.z2 ** self.d)
+        self.b2 = (self.parameters.h ** self.s2) * (self.z2 ** self.d)
         
         return self.z1, self.a, self.b1, self.b2
 
     def protocol_four(self, e):
-        self.c = (e - self.d) % self.q
-        self.r = (self.mu - (self.c * self.IssuerKeypair.x)) % self.q
+        self.c = e -  self.d
+        self.r = self.mu - self.c * self.IssuerKeypair.x
         return self.r, self.c, self.s1, self.s2, self.d
     
     def protocol_six(self, xi):
@@ -150,49 +148,21 @@ class User:
         return (self.z_u, self.UserKeypair.xi)
 
     def protocol_three(self, z1, a, b1, b2, m):
-        
-        self.zeta1 = pow(z1, self.UserKeypair.gamma, self.p)
-        
-        #nzeta1 = pow(self.zeta1, self.p - 2,self.p)
-        #self.zeta2 = self.zeta1 * nzeta1 % self.p
-        
-        self.alpha = (a * pow(self.g, self.t1, self.p) *
-                 pow(self.y, self.t2, self.p)) % self.p
-          
-        self.beta1 = (pow(b1, self.UserKeypair.gamma, self.p) *
-                pow(self.g, self.t3, self.p) *
-                pow(self.zeta1, self.t5, self.p)
-                ) % self.p
-        
-        #zt5 = pow(self.z, self.t5,self.p)
-        #nzeta1t5 = pow(pow(self.zeta1,((self.q)-1),self.p), self.t5, self.p)
-        
-        self.zeta2 = (self.z * pow(self.zeta1,(self.q)-1,self.p)) % self.p
-        
-        self.beta2 = (pow(b2, self.UserKeypair.gamma, self.p) *
-                pow(self.h, self.t4, self.p) *
-                pow(self.zeta2,self.t5,self.p)
-                ) % self.p
-
-        e_bytes = bytearray()
-        for v in (self.zeta1, self.alpha, self.beta1, self.beta2):
-            e_bytes.extend(int_to_bytes(v))
-       
-        e_bytes.extend(m)
-
-        self.epsilon = int.from_bytes(full_domain_hash(e_bytes, self.N), 'little')
-        
-        self.e = (self.epsilon - self.t2 - self.t5) % self.q
-        
+        self.zeta1 = z1 ** self.UserKeypair.gamma
+        self.zeta2 = self.z / self.zeta1
+        self.alpha = (a * (self.parameters.g ** self.t1) * (self.y ** self.t2))
+        self.beta1 = ((b1 ** self.UserKeypair.gamma) * (self.parameters.g ** self.t3) * (self.zeta1 ** self.t5))
+        self.beta2 = ((b2 ** self.UserKeypair.gamma) * (self.parameters.h ** self.t4) * (self.zeta2 ** self.t5))
+        self.epsilon = self.parameters.group.hash((self.zeta1, self.alpha, self.beta1, self.beta2, m),ZR)
+        self.e =  self.epsilon - self.t2 - self.t5
         return self.e
 
     def protocol_five(self, r, c, s1,s2, d):
-        rho = (r + self.t1) % self.q
-        omega = (c + self.t2) % self.q
-        sigma1 = (s1 * self.UserKeypair.gamma + self.t3) % self.q
-        sigma2 = (s2 * self.UserKeypair.gamma + self.t4) % self.q
-        delta = (d + self.t5) % self.q
-#         delta = (d) % self.q
+        rho = r + self.t1
+        omega = c + self.t2
+        sigma1 = (self.UserKeypair.gamma * s1) + self.t3
+        sigma2 = (self.UserKeypair.gamma * s2) + self.t4
+        delta = d + self.t5
         return rho, omega, sigma1, sigma2, delta
 
 def verify(rho, omega, delta, sigma1,sigma2, h, m, y, zeta1, zeta2,z, parameters):

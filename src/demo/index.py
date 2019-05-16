@@ -224,12 +224,6 @@ def userkey():
         
         blind_demo.putBytesToSession('gamma_bytes',gamma, params.group)
         blind_demo.putBytesToSession('xi_bytes',xi, params.group)
-        
-        blind_demo.putBytesToSession('t1_bytes',blind_demo.get_random_ZR(params.group), params.group)
-        blind_demo.putBytesToSession('t2_bytes',blind_demo.get_random_ZR(params.group), params.group)
-        blind_demo.putBytesToSession('t3_bytes',blind_demo.get_random_ZR(params.group), params.group)
-        blind_demo.putBytesToSession('t4_bytes',blind_demo.get_random_ZR(params.group), params.group)
-        blind_demo.putBytesToSession('t5_bytes',blind_demo.get_random_ZR(params.group), params.group)
 
         rjson = str(gamma) + '#' + str(xi)
         
