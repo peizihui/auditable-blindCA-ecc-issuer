@@ -14,16 +14,27 @@ def verifying():
 @app.route("/getCred", methods=['GET'])
 def getCred():
     try:
-            y = session.get('y')
-            zeta1 = session.get('zeta1')
-            rho = session.get('rho')
-            omega = session.get('omega')
-            sigma1 = session.get('sigma1')
-            sigma2 = session.get('sigma2')
-            delta = session.get('delta')
+
+            secp = session.get('secp')
+        
+            if secp == 'secp256k1':
+                params = blind_demo.choose_parameters_secp256k1()
+            elif secp == 'secp192k1':
+                params = blind_demo.choose_parameters_secp192k1()
+            elif secp == 'secp160k1':
+                params = blind_demo.choose_parameters_secp160k1()
+            
+            orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
+            orig_zeta1 = blind_demo.getObjFromSession('zeta1_bytes',params.group)
+            orig_omega = blind_demo.getObjFromSession('omega_bytes',params.group)
+            orig_sigma1 = blind_demo.getObjFromSession('sigma1_bytes',params.group)
+            orig_sigma2 = blind_demo.getObjFromSession('sigma2_bytes',params.group)
+            orig_delta = blind_demo.getObjFromSession('delta_bytes',params.group)
+            orig_rho = blind_demo.getObjFromSession('rho_bytes',params.group)
+            
             m = session.get('m')
             
-            rjson = str(y) + ',' + str(zeta1) + ',' + str(rho)+ ',' + str(omega)+ ',' + str(sigma1)+ ',' + str(sigma2)+ ',' + str(delta)+ ',' + str(m)
+            rjson = str(orig_y) + '#' + str(orig_zeta1) + '#' + str(orig_rho)+ '#' + str(orig_omega)+ '#' + str(orig_sigma1)+ '#' + str(orig_sigma2)+ '#' + str(orig_delta)+ '#' + str(m)
             
             return rjson
     except Exception as e:
@@ -32,28 +43,32 @@ def getCred():
 @app.route("/verifyCred", methods=['GET'])
 def verifyCred():
     try:
-            y = session.get('y')
-            zeta1 = session.get('zeta1')
-            zeta2 = session.get('zeta2')
-            z = session.get('z')
+            secp = session.get('secp')
+        
+            if secp == 'secp256k1':
+                params = blind_demo.choose_parameters_secp256k1()
+            elif secp == 'secp192k1':
+                params = blind_demo.choose_parameters_secp192k1()
+            elif secp == 'secp160k1':
+                params = blind_demo.choose_parameters_secp160k1()
+            
+            
             m = session.get('m')
             
-            rho = session.get('rho')
-            sigma1 = session.get('sigma1')
-            sigma2 = session.get('sigma2')
-            omega = session.get('omega')
-            delta = session.get('delta')
+            orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
+            orig_zeta1 = blind_demo.getObjFromSession('zeta1_bytes',params.group)
+            orig_zeta2 = blind_demo.getObjFromSession('zeta2_bytes',params.group)
+            orig_omega = blind_demo.getObjFromSession('omega_bytes',params.group)
+            orig_sigma1 = blind_demo.getObjFromSession('sigma1_bytes',params.group)
+            orig_sigma2 = blind_demo.getObjFromSession('sigma2_bytes',params.group)
+            orig_delta = blind_demo.getObjFromSession('delta_bytes',params.group)
+            orig_rho = blind_demo.getObjFromSession('rho_bytes',params.group)
+            orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
+            orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
+            orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
             
-            L = session.get('L')
-            N = session.get('N')
-            p = session.get('p')
-            q = session.get('q')
-            g = session.get('g')
-            h = session.get('h')
             
-            params = blind_demo.Parameters(L, N, p, q, g, h)
-            
-            lhs, rhs = blind_demo.verify(rho, omega, delta, sigma1,sigma2, h, m, y, zeta1, zeta2,z,params)
+            lhs, rhs = blind_demo.verify(orig_rho, orig_omega, orig_delta, orig_sigma1,orig_sigma2, orig_h,orig_g, m, orig_y, orig_zeta1, orig_zeta2,orig_z,params)
             
             rjson = str(lhs)  + ',' + str(rhs)
             

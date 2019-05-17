@@ -7,7 +7,7 @@ $(function(){
 	// init the index page, get the data from session
 	$.get("initgamma",function(result) {
 		 
-		 var rstring=result.split(",");	
+		 var rstring=result.split("#");	
 		    // one
 		    $("#gamma").val(rstring[0]);
 		    $("#xi").val(rstring[1]);
@@ -39,7 +39,7 @@ $(function(){
 		    $("#zeta_1").val(rstring[20]);
 		    $("#zeta2").val(rstring[21]);
 		    $("#alpha").val(rstring[22]);
-		    $("#b1").val(rstring[23]);
+		    //$("#b1").val(rstring[23]);
 		    $("#beta1").val(rstring[24]);
 		    $("#beta2").val(rstring[25]);
 		    $("#epsilon").val(rstring[26]);
@@ -97,8 +97,8 @@ $(function(){
 		 });
 	})
 	
-	$("#setParamsTwo").click(function(){
-		$.get("setParamsTwo",function(result) {
+	$("#setParamsIssuer").click(function(){
+		$.get("setParamsIssuer",function(result) {
 			    var rstring=result.split("#");	
 			    $("#upsilon").val(rstring[0]);
 			    $("#mu").val(rstring[1]);
@@ -137,18 +137,8 @@ $(function(){
 	})
 	
 	
-	$("#userExecuteThree").click(function(){
-		var m = document.getElementById("m").value;
-		//if(m == "" || m == "None" || m == null || m == undefined){
-			modal.style.display = "block";
-			//return;
-		//}
-	})
-	
-	
-	
-	$("#setParamsThree").click(function(){
-		$.get("setParamsThree",function(result) {
+	$("#setParamsUser").click(function(){
+		$.get("setParamsUser",function(result) {
 			    var rstring=result.split("#");	
 			    $("#t1").val(rstring[0]);
 			    $("#t2").val(rstring[1]);
@@ -156,6 +146,26 @@ $(function(){
 			    $("#t4").val(rstring[3]);
 			    $("#t5").val(rstring[4]);
 		 });
+	})
+	
+	
+	$("#userExecuteOne").click(function(){
+		$.post("userExecuteOne",{},function(result) {
+		    var rstring=result.split("#");	
+		    $("#gamma").val(rstring[0]);
+		    $("#xi").val(rstring[0]);
+		    $("#z").val(rstring[1]);
+		    $("#zu").val(rstring[2]);
+	 });
+	})
+	
+	
+	$("#userExecuteThree").click(function(){
+		var m = document.getElementById("m").value;
+		//if(m == "" || m == "None" || m == null || m == undefined){
+			modal.style.display = "block";
+			//return;
+		//}
 	})
 	
 	

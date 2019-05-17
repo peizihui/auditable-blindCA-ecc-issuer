@@ -107,7 +107,6 @@ class Issuer:
         self.s1= s1
         self.s2= s2
         
-        
 
     def protocol_two(self,zu):
         
@@ -129,13 +128,13 @@ class Issuer:
         return self.r, self.c, self.s1, self.s2, self.d
     
     def protocol_six(self, xi):
-        return pow(xi, self.upsilon, self.p)
+        return xi ** self.upsilon
 
 class User:
     '''User U from the paper'''
-    def __init__(self,g,h,gamma,xi,parameters):
+    def __init__(self, g, h, gamma, xi, parameters):
         self.parameters = parameters
-        self.g, self.h = g,h
+        self.g, self.h = g, h
         self.UserKeypair = UserKeypair(gamma, xi)
         
     def start(self, t1, t2, t3, t4, t5, z, y):
@@ -145,7 +144,7 @@ class User:
         
     def protocol_one(self):
         self.z_u = self.z ** (self.UserKeypair.gamma ** -1)
-        return (self.z_u, self.UserKeypair.xi)
+        return self.z_u
 
     def protocol_three(self, z1, a, b1, b2, m):
         self.zeta1 = z1 ** self.UserKeypair.gamma
@@ -165,43 +164,17 @@ class User:
         delta = d + self.t5
         return rho, omega, sigma1, sigma2, delta
 
-def verify(rho, omega, delta, sigma1,sigma2, h, m, y, zeta1, zeta2,z, parameters):
+def verify(rho, omega, delta, sigma1,sigma2, h,g,m, y, zeta1, zeta2,z, parameters):
     '''Signature verification'''
-    lhs = (omega + delta) % parameters.q
-    
-    rhs_one = zeta1
-    
-    rhs_two = (pow(parameters.g, rho, parameters.p) *
-               pow(y, omega, parameters.p)) % parameters.p
-               
-    rhs_three = (pow(parameters.g, sigma1, parameters.p) *
-               pow(zeta1, delta, parameters.p)) % parameters.p
-    
-    rhs_four = (pow(h, sigma2, parameters.p) *
-                pow(zeta2,delta,parameters.p)
-               ) % parameters.p
-    
-    rhs_hash = full_domain_hash(int_to_bytes(rhs_one) + int_to_bytes(rhs_two) +
-                                int_to_bytes(rhs_three) + int_to_bytes(rhs_four) + m, parameters.N)
-    
-    rhs = int.from_bytes(rhs_hash, 'little') % parameters.q
+    lhs = omega + delta
+
+    tmp1 = ((g ** rho) * (y ** omega)) 
+    tmp2 = (g ** sigma1 * zeta1 ** delta) 
+    tmp3 = (h ** sigma2 * zeta2 ** delta) 
+
+    rhs = parameters.group.hash((zeta1, tmp1, tmp2, tmp3, m),ZR)
     
     return lhs,rhs
-
-def credential_tracing(xi, upsilon, xt, parameters):
-    cred = pow(xi,upsilon * xt, parameters.p)
-    #print(cred)
-    #print(user.zeta1)
-    return cred == user.zeta1
-
-def identity_tracing(zeta1, xt, upsilon ,parameters):
-    
-    nxt = pow(xt, parameters.q - 2, parameters.q)
-    ide = pow(zeta1, nxt, parameters.p)
-    print(ide)
-    print(pow(user.UserKeypair.xi, upsilon, parameters.p))
-    #print(user.zeta1)
-    return ide == pow(user.UserKeypair.xi, upsilon, parameters.p)
 
 # tools
 def getObjFromSession(key, group):
@@ -213,53 +186,3 @@ def putBytesToSession(key, value, group):
     value_bytes = objectToBytes(value, group)
     session[key] = value_bytes
 
-
-
-
-if __name__ == '__main__':
-    #L, N = 1024, 160
-    L, N = 256, 40
-    
-    m = b'my msg'
-    
-    # prepare the params of 'p', 'q', 'g'
-    params = choose_parameters_secp256k1(L, N)
-    
-    # get the tracer 's public key 
-    tracerKeypair = tracer_choose_keypair(params)
-    
-    tkey = tracerKeypair.yt
-    
-    xt = tracerKeypair.xt
-    
-    issuer = Issuer(params,tkey)
-    # get the hash 
-    issuer.start()
-    
-    user = User(params, issuer.IssuerKeypair.y,tkey)
-    
-    user.start()
-
-    zu, xi = user.protocol_one()
-    
-    z1, a, b1, b2 = issuer.protocol_two(zu)
-    
-    e = user.protocol_three(z1, a, b1, b2, m)
-    
-    r, c, s1, s2, d = issuer.protocol_four(e)
-    
-    rho, omega, sigma1, sigma2, delta = user.protocol_five(r, c, s1, s2, d)
-    
-    #print((((pow(user.h, ((user.UserKeypair.gamma)*s2) + user.t4, user.p))* pow(issuer.z2, (user.UserKeypair.gamma) * d, user.p))) % user.p == 
-    #((pow(b2, user.UserKeypair.gamma, user.p)) * pow(user.h, user.t4, user.p)) % user.p
-    #)
-    #value1 = (pow(b2, user.UserKeypair.gamma, user.p) * pow(user.h, user.t4, user.p)) % user.p
-    #value2 = (pow(user.h, sigma2, user.p) * pow(user.zeta2, d, user.p)) % user.p 
-    
-    #print(value1 == value2)
-    
-    #credential_tracing(xi, issuer.upsilon, xt, params)
-    
-#     print( % user.p == ( % user.p)) 
-    
-#     print((((pow(user.h, ((user.UserKeypair.gamma)*s2) + user.t4, user.p))* pow(issuer.z2, (user.UserKeypair.gamma) * d, user.p))) % user.p)

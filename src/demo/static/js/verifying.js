@@ -6,7 +6,7 @@ $(function(){
 	
 	// init the index page, get the data from session
 	$.get("getCred",function(result) {
-		 var rstring=result.split(",");	
+		 var rstring=result.split("#");	
 		    $("#y1").val(rstring[0]);
 		    $("#y2").val(rstring[0]);
 		    

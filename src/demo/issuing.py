@@ -20,79 +20,94 @@ def issuing():
 def initgamma():
     try:
             
-            # protocol one
-            user = getUserObj()
-            orig_z = blind_demo.getObjFromSession('z_bytes',user.parameters.group)
-            zu, xi = user.protocol_one()
-            blind_demo.putBytesToSession('zu_bytes',zu, user.parameters.group)
-            orig_y = blind_demo.getObjFromSession('y_bytes',user.parameters.group)
+            secp = session.get('secp')
+            print(secp)
+        
+            if secp == 'secp256k1':
+                params = blind_demo.choose_parameters_secp256k1()
+            elif secp == 'secp192k1':
+                params = blind_demo.choose_parameters_secp192k1()
+            elif secp == 'secp160k1':
+                params = blind_demo.choose_parameters_secp160k1()
             
-            rjson1 = str(user.UserKeypair.gamma) + '#' + str(xi) + '#' + str(orig_z) + '#' + str(zu) + '#' + str(orig_y)
+            orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
+            orig_zu = blind_demo.getObjFromSession('zu_bytes',params.group)
+            orig_xi = blind_demo.getObjFromSession('xi_bytes',params.group)
+            orig_gamma = blind_demo.getObjFromSession('gamma_bytes',params.group)
+            orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
             
-            print(rjson1)
-            """
+            rjson1 = str(orig_gamma) + '#' + str(orig_xi) + '#' + str(orig_z) + '#' + str(orig_zu) + '#' + str(orig_y)
+            
+            
+            orig_zu = blind_demo.getObjFromSession('zu_bytes',params.group)
+            
+            
             # protocol two
-            upsilon = session.get('upsilon')
-            mu = session.get('mu')
-            d = session.get('d')
-            s1 = session.get('s1')
-            s2 = session.get('s2')
-            z1 = session.get('z1')
-            z2 = session.get('z2')
-            a = session.get('a')
-            b1 = session.get('b1')
-            b2 = session.get('b2')
+            orig_upsilon = blind_demo.getObjFromSession('upsilon_bytes',params.group)
+            orig_mu = blind_demo.getObjFromSession('mu_bytes',params.group)
+            orig_d = blind_demo.getObjFromSession('d_bytes',params.group)
+            orig_s1 = blind_demo.getObjFromSession('s1_bytes',params.group)
+            orig_s2 = blind_demo.getObjFromSession('s2_bytes',params.group)
+            orig_z1 = blind_demo.getObjFromSession('z1_bytes',params.group)
+            orig_z2 = blind_demo.getObjFromSession('z2_bytes',params.group)
+            orig_a = blind_demo.getObjFromSession('a_bytes',params.group)
+            orig_b1 = blind_demo.getObjFromSession('b1_bytes',params.group)
+            orig_b2 = blind_demo.getObjFromSession('b2_bytes',params.group)
             
-            rjson2 = str(upsilon) + ',' + str(mu) + ',' + str(d) + ',' + str(s1) + ',' + str(s2) + ',' + str(z1) + ',' + str(z2) + ',' + str(a)+ ',' + str(b1)+ ',' + str(b2)
+            rjson2 = str(orig_upsilon) + '#' + str(orig_mu) + '#' + str(orig_d) + '#' + str(orig_s1) + '#' + str(orig_s2) + '#' + str(orig_z1) + '#' + str(orig_z2) + '#' + str(orig_a)+ '#' + str(orig_b1)+ '#' + str(orig_b2)
             
             # protocol three
-            t1 = session.get('t1')
-            t2 = session.get('t2')
-            t3 = session.get('t3')
-            t4 = session.get('t4')
-            t5 = session.get('t5')
             
-            zeta1 = session.get('zeta1')
-            zeta2 = session.get('zeta2')
-            alpha = session.get('alpha')
-            beta1 = session.get('beta1')
-            beta2 = session.get('beta2')
-            epsilon = session.get('epsilon')
-            e = session.get('e')
+            orig_t1 = blind_demo.getObjFromSession('t1_bytes',params.group)
+            orig_t2 = blind_demo.getObjFromSession('t2_bytes',params.group)
+            orig_t3 = blind_demo.getObjFromSession('t3_bytes',params.group)
+            orig_t4 = blind_demo.getObjFromSession('t4_bytes',params.group)
+            orig_t5 = blind_demo.getObjFromSession('t5_bytes',params.group)
             
-            rjson3 = str(t1) + ',' + str(t2) + ',' + str(t3) + ',' + str(t4) + ',' + str(t5) + ',' + str(zeta1) + ',' + str(zeta2) + ',' + str(alpha)+ ',' + str(b1)+ ',' + str(beta1)+ ',' + str(beta2)+ ',' + str(epsilon)+ ',' + str(e)
+            orig_zeta1 = blind_demo.getObjFromSession('zeta1_bytes',params.group)
+            orig_zeta2 = blind_demo.getObjFromSession('zeta2_bytes',params.group)
+            orig_alpha = blind_demo.getObjFromSession('alpha_bytes',params.group)
+            orig_beta1 = blind_demo.getObjFromSession('beta1_bytes',params.group)
+            orig_beta2 = blind_demo.getObjFromSession('beta2_bytes',params.group)
+            orig_epsilon = blind_demo.getObjFromSession('epsilon_bytes',params.group)
+            orig_e = blind_demo.getObjFromSession('e_bytes',params.group)
+            
+            rjson3 = str(orig_t1) + '#' + str(orig_t2) + '#' + str(orig_t3) + '#' + str(orig_t4) + '#' + str(orig_t5) + '#' + str(orig_zeta1) + '#' + str(orig_zeta2) + '#' + str(orig_alpha)+ '#' + str(orig_b1)+ '#' + str(orig_beta1)+ '#' + str(orig_beta2)+ '#' + str(orig_epsilon)+ '#' + str(orig_e)
 
+            rjson = rjson1 + '#' + rjson2 + '#' + rjson3
             
             # protocol four
-            c = session.get('c')
-            r = session.get('r')
+            orig_c = blind_demo.getObjFromSession('c_bytes',params.group)
+            orig_r = blind_demo.getObjFromSession('r_bytes',params.group)
             
-            rjson4 = str(c) + ',' + str(r)
+            rjson4 = str(orig_c) + '#' + str(orig_r)
+            
             # protocol five
+            orig_rho = blind_demo.getObjFromSession('rho_bytes',params.group)
+            orig_omega = blind_demo.getObjFromSession('omega_bytes',params.group)
+            orig_sigma1 = blind_demo.getObjFromSession('sigma1_bytes',params.group)
+            orig_sigma2 = blind_demo.getObjFromSession('sigma2_bytes',params.group)
+            orig_delta = blind_demo.getObjFromSession('delta_bytes',params.group)
             
-            rho = session.get('rho')
-            omega = session.get('omega')
-            sigma1 = session.get('sigma1')
-            sigma2 = session.get('sigma2')
-            delta = session.get('delta')
+            rjson5 = str(orig_rho) + '#' + str(orig_omega) + '#' + str(orig_sigma1) + '#' + str(orig_sigma2) + '#' + str(orig_delta)
             
-            rjson5 = str(rho) + ',' + str(omega) + ',' + str(sigma1) + ',' + str(sigma2) + ',' + str(delta)
+            rjson = rjson1 + '#' + rjson2 + '#' + rjson3 + '#' + rjson4 + '#' + rjson5
             
-           
+            
             m = session.get('m')
             if(m != None):
                 m = m.decode('utf-8')
             else:
                 m = 'None'
             
-            rjson = rjson1 + ',' + rjson2 + ',' + rjson3 + ',' + rjson4 + ',' + rjson5 + ',' + m
+            rjson =  rjson + '#' + m
             
             contractAddress = session.get('cas')
             xiupsilon = session.get('xiupsilon')
             
-            rjson = rjson + ',' + str(contractAddress) + ',' + str(xiupsilon)
-            """
-            return rjson1
+            rjson = rjson + '#' + str(contractAddress) + '#' + str(xiupsilon)
+            
+            return rjson
     except Exception:
         return "0"
     
@@ -107,29 +122,29 @@ def issuerExecuteTwo():
             xt = tracerparams.yt
             yt = tracerparams.yt
             
-            blind_demo.putBytesToSession('xt_bytes',xt, issuer.parameters.group)
-            blind_demo.putBytesToSession('yt_bytes',yt, issuer.parameters.group)
+            blind_demo.putBytesToSession('xt_bytes', xt, issuer.parameters.group)
+            blind_demo.putBytesToSession('yt_bytes', yt, issuer.parameters.group)
             issuer.tkey = yt
             
             issuer.protocol_two(orig_zu)
             
-            blind_demo.putBytesToSession('z1_bytes',issuer.z1, issuer.parameters.group)
-            blind_demo.putBytesToSession('z2_bytes',issuer.z2, issuer.parameters.group)
-            blind_demo.putBytesToSession('a_bytes',issuer.a, issuer.parameters.group)
-            blind_demo.putBytesToSession('b1_bytes',issuer.b1, issuer.parameters.group)
-            blind_demo.putBytesToSession('b2_bytes',issuer.b2, issuer.parameters.group)
+            blind_demo.putBytesToSession('z1_bytes', issuer.z1, issuer.parameters.group)
+            blind_demo.putBytesToSession('z2_bytes', issuer.z2, issuer.parameters.group)
+            blind_demo.putBytesToSession('a_bytes', issuer.a, issuer.parameters.group)
+            blind_demo.putBytesToSession('b1_bytes', issuer.b1, issuer.parameters.group)
+            blind_demo.putBytesToSession('b2_bytes', issuer.b2, issuer.parameters.group)
             
             rjson = str(issuer.z1) + '#' + str(issuer.z2) + '#' + str(issuer.a) + '#' + str(issuer.b1)+ '#' + str(issuer.b2)
             
-            print(rjson)
+            
             
             return rjson
     except Exception as e:
         print(e)
         return "0"
 
-@app.route("/setParamsTwo", methods=['GET'])
-def setParamsTwo():
+@app.route("/setParamsIssuer", methods=['GET'])
+def setParamsIssuer():
     try:
             
             secp = session.get('secp')
@@ -156,8 +171,8 @@ def setParamsTwo():
         print(e)
         return "0"
 
-@app.route("/setParamsThree", methods=['GET'])
-def setParamsThree():
+@app.route("/setParamsUser", methods=['GET'])
+def setParamsUser():
     try:
             
             secp = session.get('secp')
@@ -182,6 +197,20 @@ def setParamsThree():
             return rjson
     except Exception as e:
         print(e)
+        return "0"
+
+@app.route("/userExecuteOne", methods=['POST'])
+def userExecuteOne():
+    try:
+            user = getUserObj()
+            zu = user.protocol_one()
+            blind_demo.putBytesToSession('zu_bytes',zu, user.parameters.group)
+            
+            orig_z = blind_demo.getObjFromSession('z_bytes',user.parameters.group)
+            rjson = str(user.UserKeypair.gamma) + '#' + str(user.UserKeypair.xi)+ '#' + str(orig_z) + '#' + str(zu)
+            return rjson
+    except Exception as e1:
+        print(e1)
         return "0"
 
 
@@ -240,17 +269,13 @@ def issuerExecuteFour():
 def issuerExecuteSix():
     try:
             issuer = getIssuerObj()
-            
-            print(session.get('xi'))
-            
-            xi = int(session.get('xi'))
+            orig_xi = blind_demo.getObjFromSession('xi_bytes',issuer.parameters.group)
             
             contractAddress = session.get('cas')
+            xiupsilon = issuer.protocol_six(orig_xi)
+            blind_demo.putBytesToSession('xiupsilon_bytes',xiupsilon, issuer.parameters.group)
             
-            xiupsilon = issuer.protocol_six(xi) 
-            session['xiupsilon'] = xiupsilon
-            
-            rjson  = str(xi) + "," + str(xiupsilon) + "," + str(contractAddress)
+            rjson  = str(orig_xi) + "," + str(xiupsilon) + "," + str(contractAddress)
             return rjson
         
     except Exception as e:
@@ -339,21 +364,49 @@ def getUserObj():
             elif secp == 'secp160k1':
                 params = blind_demo.choose_parameters_secp160k1()
             
-            orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
-            orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
-            orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
-            orig_gamma = blind_demo.getObjFromSession('gamma_bytes',params.group)
-            orig_xi = blind_demo.getObjFromSession('xi_bytes',params.group)
             
-            orig_t1 = blind_demo.getObjFromSession('t1_bytes',params.group)
-            orig_t2 = blind_demo.getObjFromSession('t2_bytes',params.group)
-            orig_t3 = blind_demo.getObjFromSession('t3_bytes',params.group)
-            orig_t4 = blind_demo.getObjFromSession('t4_bytes',params.group)
-            orig_t5 = blind_demo.getObjFromSession('t5_bytes',params.group)
-            orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
+            if session.get('g_bytes')!=None:
+                orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
+            if session.get('h_bytes')!=None:
+                orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
+            if session.get('z_bytes')!=None:
+                orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
+            if session.get('gamma_bytes')!=None:
+                orig_gamma = blind_demo.getObjFromSession('gamma_bytes',params.group)
+            if session.get('xi_bytes')!=None:
+                orig_xi = blind_demo.getObjFromSession('xi_bytes',params.group)
+            
+            if session.get('t1_bytes')!=None:
+                orig_t1 = blind_demo.getObjFromSession('t1_bytes',params.group)
+            if session.get('t2_bytes')!=None:
+                orig_t2 = blind_demo.getObjFromSession('t2_bytes',params.group)
+            if session.get('t3_bytes')!=None:
+                orig_t3 = blind_demo.getObjFromSession('t3_bytes',params.group)
+            if session.get('t4_bytes')!=None:
+                orig_t4 = blind_demo.getObjFromSession('t4_bytes',params.group)
+            if session.get('t5_bytes')!=None:
+                orig_t5 = blind_demo.getObjFromSession('t5_bytes',params.group)
+            if session.get('y_bytes')!=None:
+                orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
+                
+            print(4444444)
+            
             
             user = blind_demo.User(orig_g,orig_h,orig_gamma,orig_xi,params)
-            user.start( orig_t1, orig_t2, orig_t3, orig_t4, orig_t5, orig_z, orig_y)
+            
+            print(user)
+            
+            print(2222)
+            
+            print(orig_t1)
+            print(orig_t2)
+            print(orig_t3)
+            print(orig_t4)
+            print(orig_t5)
+            print(orig_z)
+            print(orig_y)
+            
+            user.start(orig_t1, orig_t2, orig_t3, orig_t4, orig_t5, orig_z, orig_y)
             
             return user
     except Exception:

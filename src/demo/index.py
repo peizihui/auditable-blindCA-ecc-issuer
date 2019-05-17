@@ -43,15 +43,8 @@ def init():
         a = session.get('a')
         b = session.get('b')
         n = session.get('n')
-
-        gx = session.get('gx')
-        gy = session.get('gy')
-        hx = session.get('hx')
-        hy = session.get('hy')
         
-        
-        
-        secp = session['secp']
+        secp = session.get('secp')
         
         if secp == 'secp256k1':
             params = blind_demo.choose_parameters_secp256k1()
@@ -60,16 +53,17 @@ def init():
         elif secp == 'secp160k1':
             params = blind_demo.choose_parameters_secp160k1()
         
+        orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
+        orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
+        
         
         orig_x = blind_demo.getObjFromSession('x_bytes',params.group)
         orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
         orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
         orig_gamma = blind_demo.getObjFromSession('gamma_bytes',params.group)
         orig_xi = blind_demo.getObjFromSession('xi_bytes',params.group)
-        
 
-
-        rjson = str(p) + '#' + str(a) + '#' + str(b) + '#' + str(n) + '#' + str(gx) + '#' + str(gy) + '#' + str(hx) + '#' + str(hy) \
+        rjson = str(p) + '#' + str(a) + '#' + str(b) + '#' + str(n) + '#' + str(orig_g) + '#' + str(orig_h) \
         + '#' + str(secp) + "#" + str(orig_x) + '#' + str(orig_y) + '#' + str(orig_z) + '#' + str(orig_gamma) + '#' + str(orig_xi)
 
         return rjson
@@ -80,7 +74,7 @@ def init():
 @app.route('/setup', methods=['POST'])
 def setup():
     try:
-        session.clear()
+        #session.clear()
 
         secp = str(request.form['secp'])
 
@@ -89,19 +83,15 @@ def setup():
             a,
             b,
             n,
-            gx,
-            gy,
-            hx,
-            hy,
+            g,
+            h
             ) = (
             0,
             0,
             0,
             0,
-            0,
-            0,
-            0,
-            0,
+            None,
+            None
             )
 
         if secp == 'secp256k1':
@@ -110,11 +100,9 @@ def setup():
             a = 0
             b = 7
             n = 115792089237316195423570985008687907852837564279074904382605163141518161494337
-            gx = params.group.coordinates(params.g)[0]
-            gy = params.group.coordinates(params.g)[1]
-            hx = params.group.coordinates(params.h)[0]
-            hy = params.group.coordinates(params.h)[1]
-            secp = 'secp256k1'
+            g = params.g
+            h = params.h
+
         elif secp == 'secp192k1':
 
             params = blind_demo.choose_parameters_secp192k1()
@@ -122,37 +110,32 @@ def setup():
             a = 0
             b = 3
             n = 6277101735386680763835789423061264271957123915200845512077
-            gx = params.group.coordinates(params.g)[0]
-            gy = params.group.coordinates(params.g)[1]
-            hx = params.group.coordinates(params.h)[0]
-            hy = params.group.coordinates(params.h)[1]
-            secp = 'secp192k1'
+            g = params.g
+            h = params.h
+            
         elif secp == 'secp160k1':
             params = blind_demo.choose_parameters_secp160k1()
             p = 1461501637330902918203684832716283019651637554291
             a = 0
             b = 7
             n = 1461501637330902918203686915170869725397159163571
-            gx = params.group.coordinates(params.g)[0]
-            gy = params.group.coordinates(params.g)[1]
-            hx = params.group.coordinates(params.h)[0]
-            hy = params.group.coordinates(params.h)[1]
-            secp = 'secp160k1'
+            g = params.g
+            h = params.h
         
-        blind_demo.putBytesToSession('g_bytes',params.g, params.group)
-        blind_demo.putBytesToSession('h_bytes',params.h, params.group)
+        blind_demo.putBytesToSession('g_bytes', params.g, params.group)
+        blind_demo.putBytesToSession('h_bytes', params.h, params.group)
         
         session['p'] = p
         session['a'] = a
         session['b'] = b
         session['n'] = n
-        session['gx'] = str(gx)
-        session['gy'] = str(gy)
-        session['hx'] = str(hx)
-        session['hy'] = str(hy)
+        
         session['secp'] = secp
+        
+        print(secp)
+        print(session.get('secp'))
 
-        rjson = str(p) + ',' + str(a) + ',' + str(b) + ',' + str(n) + ',' + str(gx) + ',' + str(gy) + ',' + str(hx) + ',' + str(hy)
+        rjson = str(p) + '#' + str(a) + '#' + str(b) + '#' + str(n) + '#' + str(g) + '#' + str(h)
         return rjson
     except Exception:
         return '0'
@@ -173,7 +156,9 @@ def setup():
 @app.route('/issuerkey', methods=['POST'])
 def issuerkey():
     try:
-        secp = session['secp']
+        
+        secp = session.get('secp')
+        print(session.get('secp'))
         
         if secp == 'secp256k1':
             params = blind_demo.choose_parameters_secp256k1()
@@ -184,15 +169,15 @@ def issuerkey():
         
         orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
         orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
-
         issuerparams = blind_demo.issuer_choose_keypair(params.group,orig_g)
-
         x = issuerparams.x
         y = issuerparams.y
         
-        blind_demo.putBytesToSession('x_bytes',x, params.group)
-        blind_demo.putBytesToSession('y_bytes',y, params.group)
+        blind_demo.putBytesToSession('x_bytes', x, params.group)
+        blind_demo.putBytesToSession('y_bytes', y, params.group)
 
+        print(y)
+        
         z = blind_demo.gnerate_common_z(params.group, orig_g, orig_h, y)
         
         blind_demo.putBytesToSession('z_bytes',z, params.group)
@@ -206,7 +191,9 @@ def issuerkey():
 @app.route('/userkey', methods=['POST'])
 def userkey():
     try:
-        secp = session['secp']
+        secp = session.get('secp')
+        print(session.get('secp'))
+        print(secp)
 
         if secp == 'secp256k1':
             params = blind_demo.choose_parameters_secp256k1()

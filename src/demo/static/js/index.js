@@ -17,26 +17,20 @@ $(function(){
 			$("#n1").val(rstring[3]);
 			$("#n2").val(rstring[3]);
 			
-			$("#gx1").val(rstring[4]);
-			$("#gx2").val(rstring[4]);
+			$("#g1").val(rstring[4]);
+			$("#g2").val(rstring[4]);
 			
-			$("#gy1").val(rstring[5]);
-			$("#gy2").val(rstring[5]);
+			$("#h1").val(rstring[5]);
+			$("#h2").val(rstring[5]);
 			
-			$("#hx1").val(rstring[6]);
-			$("#hx2").val(rstring[6]);
+			secp = rstring[6]
 			
-			$("#hy1").val(rstring[7]);
-			$("#hy2").val(rstring[7]);
-			
-			secp = rstring[8]
-			
-			$("#x").val(rstring[9]);
-			$("#y").val(rstring[10]);
-			$("#z1").val(rstring[11]);
-			$("#z2").val(rstring[11]);
-			$("#gamma").val(rstring[12]);
-			$("#xi").val(rstring[13]);
+			$("#x").val(rstring[7]);
+			$("#y").val(rstring[8]);
+			$("#z1").val(rstring[9]);
+			$("#z2").val(rstring[9]);
+			$("#gamma").val(rstring[10]);
+			$("#xi").val(rstring[11]);
 			
 			
 			$("#selectParam").find("option:contains('"+secp+"')").attr("selected",true);
@@ -50,7 +44,7 @@ $(function(){
 		
 		$.post("setup", postdata,function(result) {
 				
-				var rstring=result.split(",");	
+				var rstring=result.split("#");	
 				$("#p1").val(rstring[0]);
 				$("#p2").val(rstring[0]);
 				
@@ -63,17 +57,11 @@ $(function(){
 				$("#n1").val(rstring[3]);
 				$("#n2").val(rstring[3]);
 				
-				$("#gx1").val(rstring[4]);
-				$("#gx2").val(rstring[4]);
+				$("#g1").val(rstring[4]);
+				$("#g2").val(rstring[4]);
 				
-				$("#gy1").val(rstring[5]);
-				$("#gy2").val(rstring[5]);
-				
-				$("#hx1").val(rstring[6]);
-				$("#hx2").val(rstring[6]);
-				
-				$("#hy1").val(rstring[7]);
-				$("#hy2").val(rstring[7]);
+				$("#h1").val(rstring[5]);
+				$("#h2").val(rstring[5]);
 		 });  
     });
 	
