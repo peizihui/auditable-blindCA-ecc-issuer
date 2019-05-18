@@ -16,19 +16,25 @@ TracerKeypair = namedtuple('TracerKeypair', ['xt', 'yt'])
 
 def choose_parameters_secp256k1():
     group = ECGroup(secp256k1)
-    g, h = group.random(G), group.random(G)
+    #g, h = group.random(G), group.random(G)
+    g = until.point2Obj(14519509735293947827288577209312317083665953431108465511763141066544895460406, group)
+    h = until.point2Obj(19684769395795572483620032515699151948010901016215908752425022930402275400968, group)
     parameters = Parameters(type, group, g, h)
     return parameters
 
 def choose_parameters_secp192k1():
     group = ECGroup(secp192k1)
-    g, h = group.random(G), group.random(G)
+    #g, h = group.random(G), group.random(G)
+    g = until.point2Obj(1428563551188986083161179061956749636445572091115567662998, group)
+    h = until.point2Obj(1644171847129458040208599782211559882005427686467664482898, group)
     parameters = Parameters(type, group, g, h)
     return parameters
 
 def choose_parameters_secp160k1():
     group = ECGroup(secp160k1)
-    g, h = group.random(G), group.random(G)
+    #g, h = group.random(G), group.random(G)
+    g = until.point2Obj(1440606596302292137865565305431040127675688261889, group)
+    h = until.point2Obj(1381151724931566432059668780755783165187210921324, group)
     parameters = Parameters(type, group, g, h)
     return parameters
 
@@ -83,14 +89,15 @@ def digest(data, parameters):
 
 ### Protocol stuff ###
 class Issuer:
-    '''Issuer S from the paper'''
     def __init__(self, g, h, x, y, z, parameters):
+        print("g0:", parameters.g)
         self.parameters = parameters
         self.g, self.h, self.z = g, h, z
         self.IssuerKeypair = IssuerKeypair(x, y)
 
     def protocol_two(self,yt,upsilon,zu,mu,s1,s2,d):
         
+        print("g2:", self.parameters.g)
         z1 = yt ** upsilon
         z2 = zu * (z1 ** -1)
         a = self.parameters.g ** mu
@@ -100,6 +107,7 @@ class Issuer:
         return z1, z2, a, b1, b2
 
     def protocol_four(self, e, d, mu):
+        print("g4:", self.parameters.g)
         c = e -  d
         r = mu - c * self.IssuerKeypair.x
         return r, c
@@ -115,10 +123,12 @@ class User:
         self.UserKeypair = UserKeypair(gamma, xi)
         
     def protocol_one(self,z,gamma):
+        print("g1:", self.parameters.g)
         zu = z ** (gamma ** -1)
         return zu
 
     def protocol_three(self, z1, a, b1, b2, m, y, t1, t2, t3, t4, t5):
+        print("g3:", self.parameters.g)
         zeta1 = z1 ** self.UserKeypair.gamma
         zeta2 = self.z * (zeta1 ** -1)
         alpha = (a * (self.parameters.g ** t1) * (y ** t2))
@@ -129,6 +139,7 @@ class User:
         return zeta1, zeta2, alpha, beta1, beta2, epsilon, e 
 
     def protocol_five(self, r, c, s1, s2, d, t1, t2, t3, t4, t5):
+        print("g5:", self.parameters.g)
         rho = r + t1
         omega = c + t2
         sigma1 = (self.UserKeypair.gamma * s1) + t3

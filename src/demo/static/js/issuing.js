@@ -60,8 +60,8 @@ $(function(){
 		    $("#m").val(rstring[35]);
 		    
 		    $("#upk").val(rstring[1]);
-		    $("#identity").val(rstring[36]);
-		    $("#contractAddress").val(rstring[37]);
+		    $("#contractAddress").val(rstring[36]);
+		    $("#identity").val(rstring[37]);
 		    
 		    // set m
 		    

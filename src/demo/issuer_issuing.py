@@ -54,7 +54,6 @@ def initgamma():
             rjson2 = str(orig_upsilon) + '#' + str(orig_mu) + '#' + str(orig_d) + '#' + str(orig_s1) + '#' + str(orig_s2) + '#' + str(orig_z1) + '#' + str(orig_z2) + '#' + str(orig_a)+ '#' + str(orig_b1)+ '#' + str(orig_b2)
             
             # protocol three
-            
             orig_t1 = until.getObjFromSession('t1_bytes',params.group)
             orig_t2 = until.getObjFromSession('t2_bytes',params.group)
             orig_t3 = until.getObjFromSession('t3_bytes',params.group)
@@ -70,8 +69,6 @@ def initgamma():
             orig_e = until.getObjFromSession('e_bytes',params.group)
             
             rjson3 = str(orig_t1) + '#' + str(orig_t2) + '#' + str(orig_t3) + '#' + str(orig_t4) + '#' + str(orig_t5) + '#' + str(orig_zeta1) + '#' + str(orig_zeta2) + '#' + str(orig_alpha)+ '#' + str(orig_b1)+ '#' + str(orig_beta1)+ '#' + str(orig_beta2)+ '#' + str(orig_epsilon)+ '#' + str(orig_e)
-
-            rjson = rjson1 + '#' + rjson2 + '#' + rjson3
             
             # protocol four
             orig_c = until.getObjFromSession('c_bytes',params.group)
@@ -99,9 +96,9 @@ def initgamma():
             rjson =  rjson + '#' + m
             
             contractAddress = session.get('cas')
-            xiupsilon = session.get('xiupsilon')
+            orig_xiupsilon = until.getObjFromSession('xiupsilon_bytes',params.group)
             
-            rjson = rjson + '#' + str(contractAddress) + '#' + str(xiupsilon)
+            rjson = rjson + '#' + str(contractAddress) + '#' + str(orig_xiupsilon)
             
             return rjson
     except Exception:
@@ -141,6 +138,10 @@ def setParamsIssuer():
 def issuerExecuteTwo():
     try:
             issuer = getIssuerObj()
+            
+            
+            
+            print(issuer.parameters.group)
             
             orig_zu = until.getObjFromSession('zu_bytes',issuer.parameters.group)
             orig_upsilon = until.getObjFromSession('upsilon_bytes',issuer.parameters.group)
@@ -199,6 +200,7 @@ def issuerExecuteSix():
             orig_upsilon = until.getObjFromSession('upsilon_bytes',issuer.parameters.group)
             
             xiupsilon = issuer.protocol_six(orig_xi, orig_upsilon)
+            
             until.putBytesToSession('xiupsilon_bytes',xiupsilon, issuer.parameters.group)
             
             rjson  = str(orig_xi) + "," + str(xiupsilon) + "," + str(contractAddress)
@@ -211,6 +213,8 @@ def issuerExecuteSix():
 def getIssuerObj():
     try:
             secp = session.get('secp')
+            
+            print(secp)
         
             if secp == 'secp256k1':
                 params = blind_demo.choose_parameters_secp256k1()
@@ -225,7 +229,10 @@ def getIssuerObj():
             orig_y = until.getObjFromSession('y_bytes',params.group)
             orig_z = until.getObjFromSession('z_bytes',params.group)
             
+            print(params)
             issuer = blind_demo.Issuer(orig_g,orig_h,orig_x,orig_y,orig_z,params)
+            
+            print(issuer.parameters)
             
             """
             if session.get('upsilon_bytes')!=None:
@@ -245,7 +252,6 @@ def getIssuerObj():
             
             issuer.start(orig_z,orig_upsilon,orig_mu,orig_d,orig_s1,orig_s2)
             """
-            
             
             return issuer
     except Exception:
