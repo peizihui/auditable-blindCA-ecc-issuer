@@ -44,8 +44,7 @@ def init():
             params = blind_demo.choose_parameters_secp256k1()
         elif secp == 'secp192k1':
             params = blind_demo.choose_parameters_secp192k1()
-        elif secp == 'secp160k1':
-            params = blind_demo.choose_parameters_secp160k1()
+        
         
         orig_h = until.getObjFromSession('h_bytes',params.group)
         orig_g = until.getObjFromSession('g_bytes',params.group)
@@ -107,15 +106,6 @@ def setup():
             g = params.g
             h = params.h
             
-        elif secp == 'secp160k1':
-            params = blind_demo.choose_parameters_secp160k1()
-            p = 1461501637330902918203684832716283019651637554291
-            a = 0
-            b = 7
-            n = 1461501637330902918203686915170869725397159163571
-            g = params.g
-            h = params.h
-        
         until.putBytesToSession('g_bytes', g, params.group)
         until.putBytesToSession('h_bytes', h, params.group)
         
@@ -155,8 +145,6 @@ def issuerkey():
             params = blind_demo.choose_parameters_secp256k1()
         elif secp == 'secp192k1':
             params = blind_demo.choose_parameters_secp192k1()
-        elif secp == 'secp160k1':
-            params = blind_demo.choose_parameters_secp160k1()
         
         orig_h = until.getObjFromSession('h_bytes',params.group)
         orig_g = until.getObjFromSession('g_bytes',params.group)
@@ -189,8 +177,6 @@ def userkey():
             params = blind_demo.choose_parameters_secp256k1()
         elif secp == 'secp192k1':
             params = blind_demo.choose_parameters_secp192k1()
-        elif secp == 'secp160k1':
-            params = blind_demo.choose_parameters_secp160k1()
 
         orig_g = until.getObjFromSession('g_bytes',params.group)
 

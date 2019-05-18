@@ -16,8 +16,7 @@ def setParamsUser():
                 params = blind_demo.choose_parameters_secp256k1()
             elif secp == 'secp192k1':
                 params = blind_demo.choose_parameters_secp192k1()
-            elif secp == 'secp160k1':
-                params = blind_demo.choose_parameters_secp160k1()
+           
            
             t1, t2, t3, t4, t5 = blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group)
             
@@ -131,8 +130,7 @@ def getUserObj():
                 params = blind_demo.choose_parameters_secp256k1()
             elif secp == 'secp192k1':
                 params = blind_demo.choose_parameters_secp192k1()
-            elif secp == 'secp160k1':
-                params = blind_demo.choose_parameters_secp160k1()
+            
             
             if session.get('g_bytes')!=None:
                 orig_g = until.getObjFromSession('g_bytes',params.group)

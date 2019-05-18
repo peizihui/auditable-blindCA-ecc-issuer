@@ -22,8 +22,7 @@ def getCred():
                 params = blind_demo.choose_parameters_secp256k1()
             elif secp == 'secp192k1':
                 params = blind_demo.choose_parameters_secp192k1()
-            elif secp == 'secp160k1':
-                params = blind_demo.choose_parameters_secp160k1()
+            
             
             orig_y = until.getObjFromSession('y_bytes',params.group)
             orig_zeta1 = until.getObjFromSession('zeta1_bytes',params.group)
@@ -50,8 +49,6 @@ def verifyCred():
                 params = blind_demo.choose_parameters_secp256k1()
             elif secp == 'secp192k1':
                 params = blind_demo.choose_parameters_secp192k1()
-            elif secp == 'secp160k1':
-                params = blind_demo.choose_parameters_secp160k1()
             
             m = session.get('m')
             

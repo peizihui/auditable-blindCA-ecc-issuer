@@ -33,15 +33,20 @@ $(function(){
 			$("#xi").val(rstring[11]);
 			
 			
-			$("#selectParam").find("option:contains('"+secp+"')").attr("selected",true);
+			//$("#selectParam").find("option:contains('"+secp+"')").attr("selected",true);
+			
+			//$('input:radio').find("id:contains('"+secp+"')").attr('checked', 'true');
+			$("#"+secp).attr('checked', true);
+			
 		}
 	});
 	
 	
-	$("#selectParam").change(function(){
-        var selectParam = $(this).children("option:selected").val();
+	$('input[type=radio]').click(function() {
+        //var selectParam = $(this).children("option:selected").val();
+        var selectParam = $("input[type=radio]:checked").val();
 		var postdata = {'secp':selectParam}
-		
+		alert(selectParam)
 		$.post("setup", postdata,function(result) {
 				
 				var rstring=result.split("#");	

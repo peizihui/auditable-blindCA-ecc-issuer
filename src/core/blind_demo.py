@@ -30,14 +30,6 @@ def choose_parameters_secp192k1():
     parameters = Parameters(type, group, g, h)
     return parameters
 
-def choose_parameters_secp160k1():
-    group = ECGroup(secp160k1)
-    #g, h = group.random(G), group.random(G)
-    g = until.point2Obj(1440606596302292137865565305431040127675688261889, group)
-    h = until.point2Obj(1381151724931566432059668780755783165187210921324, group)
-    parameters = Parameters(type, group, g, h)
-    return parameters
-
 def issuer_choose_keypair(group,orig_g):
     x = group.random(ZR)
     y = orig_g ** x

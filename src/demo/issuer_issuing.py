@@ -26,8 +26,7 @@ def initgamma():
                 params = blind_demo.choose_parameters_secp256k1()
             elif secp == 'secp192k1':
                 params = blind_demo.choose_parameters_secp192k1()
-            elif secp == 'secp160k1':
-                params = blind_demo.choose_parameters_secp160k1()
+            
             
             orig_z = until.getObjFromSession('z_bytes',params.group)
             orig_zu = until.getObjFromSession('zu_bytes',params.group)
@@ -114,8 +113,7 @@ def setParamsIssuer():
                 params = blind_demo.choose_parameters_secp256k1()
             elif secp == 'secp192k1':
                 params = blind_demo.choose_parameters_secp192k1()
-            elif secp == 'secp160k1':
-                params = blind_demo.choose_parameters_secp160k1()
+            
            
             upsilon, mu, s1, s2, d = blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group),blind_demo.get_random_ZR(params.group)
             
@@ -220,8 +218,7 @@ def getIssuerObj():
                 params = blind_demo.choose_parameters_secp256k1()
             elif secp == 'secp192k1':
                 params = blind_demo.choose_parameters_secp192k1()
-            elif secp == 'secp160k1':
-                params = blind_demo.choose_parameters_secp160k1()
+            
             
             orig_h = until.getObjFromSession('h_bytes',params.group)
             orig_g = until.getObjFromSession('g_bytes',params.group)
