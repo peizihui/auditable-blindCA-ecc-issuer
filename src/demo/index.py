@@ -8,13 +8,7 @@
 from flask import request, session, json, render_template
 from . import app
 from core import blind_demo
-#from charm.core.engine.util import objectToBytes, bytesToObject
-from pip._vendor.six import int2byte
-from charm.toolbox.ecgroup import ECGroup,G,ZR
-from charm.toolbox.eccurve import secp160k1,secp192k1,secp256k1
-from charm.toolbox.conversion import Conversion
-from charm.core.math.elliptic_curve import elliptic_curve,ec_element
-
+from core import until
 
 @app.route('/')
 def default():
@@ -53,15 +47,15 @@ def init():
         elif secp == 'secp160k1':
             params = blind_demo.choose_parameters_secp160k1()
         
-        orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
-        orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
+        orig_h = until.getObjFromSession('h_bytes',params.group)
+        orig_g = until.getObjFromSession('g_bytes',params.group)
         
         
-        orig_x = blind_demo.getObjFromSession('x_bytes',params.group)
-        orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
-        orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
-        orig_gamma = blind_demo.getObjFromSession('gamma_bytes',params.group)
-        orig_xi = blind_demo.getObjFromSession('xi_bytes',params.group)
+        orig_x = until.getObjFromSession('x_bytes',params.group)
+        orig_y = until.getObjFromSession('y_bytes',params.group)
+        orig_z = until.getObjFromSession('z_bytes',params.group)
+        orig_gamma = until.getObjFromSession('gamma_bytes',params.group)
+        orig_xi = until.getObjFromSession('xi_bytes',params.group)
 
         rjson = str(p) + '#' + str(a) + '#' + str(b) + '#' + str(n) + '#' + str(orig_g) + '#' + str(orig_h) \
         + '#' + str(secp) + "#" + str(orig_x) + '#' + str(orig_y) + '#' + str(orig_z) + '#' + str(orig_gamma) + '#' + str(orig_xi)
@@ -122,8 +116,8 @@ def setup():
             g = params.g
             h = params.h
         
-        blind_demo.putBytesToSession('g_bytes', params.g, params.group)
-        blind_demo.putBytesToSession('h_bytes', params.h, params.group)
+        until.putBytesToSession('g_bytes', g, params.group)
+        until.putBytesToSession('h_bytes', h, params.group)
         
         session['p'] = p
         session['a'] = a
@@ -131,9 +125,6 @@ def setup():
         session['n'] = n
         
         session['secp'] = secp
-        
-        print(secp)
-        print(session.get('secp'))
 
         rjson = str(p) + '#' + str(a) + '#' + str(b) + '#' + str(n) + '#' + str(g) + '#' + str(h)
         return rjson
@@ -167,20 +158,19 @@ def issuerkey():
         elif secp == 'secp160k1':
             params = blind_demo.choose_parameters_secp160k1()
         
-        orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
-        orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
+        orig_h = until.getObjFromSession('h_bytes',params.group)
+        orig_g = until.getObjFromSession('g_bytes',params.group)
         issuerparams = blind_demo.issuer_choose_keypair(params.group,orig_g)
         x = issuerparams.x
         y = issuerparams.y
         
-        blind_demo.putBytesToSession('x_bytes', x, params.group)
-        blind_demo.putBytesToSession('y_bytes', y, params.group)
+        until.putBytesToSession('x_bytes', x, params.group)
+        until.putBytesToSession('y_bytes', y, params.group)
 
         print(y)
         
         z = blind_demo.gnerate_common_z(params.group, orig_g, orig_h, y)
-        
-        blind_demo.putBytesToSession('z_bytes',z, params.group)
+        until.putBytesToSession('z_bytes',z, params.group)
         
         rjson = str(x) + "#" + str(y) + "#" + str(z)
         return rjson
@@ -202,15 +192,15 @@ def userkey():
         elif secp == 'secp160k1':
             params = blind_demo.choose_parameters_secp160k1()
 
-        orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
+        orig_g = until.getObjFromSession('g_bytes',params.group)
 
         userparams = blind_demo.user_choose_keypair(params.group,orig_g)
 
         xi = userparams.xi
         gamma = userparams.gamma
         
-        blind_demo.putBytesToSession('gamma_bytes',gamma, params.group)
-        blind_demo.putBytesToSession('xi_bytes',xi, params.group)
+        until.putBytesToSession('gamma_bytes',gamma, params.group)
+        until.putBytesToSession('xi_bytes',xi, params.group)
 
         rjson = str(gamma) + '#' + str(xi)
         

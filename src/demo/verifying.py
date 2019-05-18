@@ -6,6 +6,7 @@ from flask import session,render_template
 from . import app
 #from . import db
 from core import blind_demo
+from core import until
 
 @app.route('/verifying')
 def verifying():
@@ -24,13 +25,13 @@ def getCred():
             elif secp == 'secp160k1':
                 params = blind_demo.choose_parameters_secp160k1()
             
-            orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
-            orig_zeta1 = blind_demo.getObjFromSession('zeta1_bytes',params.group)
-            orig_omega = blind_demo.getObjFromSession('omega_bytes',params.group)
-            orig_sigma1 = blind_demo.getObjFromSession('sigma1_bytes',params.group)
-            orig_sigma2 = blind_demo.getObjFromSession('sigma2_bytes',params.group)
-            orig_delta = blind_demo.getObjFromSession('delta_bytes',params.group)
-            orig_rho = blind_demo.getObjFromSession('rho_bytes',params.group)
+            orig_y = until.getObjFromSession('y_bytes',params.group)
+            orig_zeta1 = until.getObjFromSession('zeta1_bytes',params.group)
+            orig_omega = until.getObjFromSession('omega_bytes',params.group)
+            orig_sigma1 = until.getObjFromSession('sigma1_bytes',params.group)
+            orig_sigma2 = until.getObjFromSession('sigma2_bytes',params.group)
+            orig_delta = until.getObjFromSession('delta_bytes',params.group)
+            orig_rho = until.getObjFromSession('rho_bytes',params.group)
             
             m = session.get('m')
             
@@ -52,21 +53,26 @@ def verifyCred():
             elif secp == 'secp160k1':
                 params = blind_demo.choose_parameters_secp160k1()
             
-            
             m = session.get('m')
             
-            orig_y = blind_demo.getObjFromSession('y_bytes',params.group)
-            orig_zeta1 = blind_demo.getObjFromSession('zeta1_bytes',params.group)
-            orig_zeta2 = blind_demo.getObjFromSession('zeta2_bytes',params.group)
-            orig_omega = blind_demo.getObjFromSession('omega_bytes',params.group)
-            orig_sigma1 = blind_demo.getObjFromSession('sigma1_bytes',params.group)
-            orig_sigma2 = blind_demo.getObjFromSession('sigma2_bytes',params.group)
-            orig_delta = blind_demo.getObjFromSession('delta_bytes',params.group)
-            orig_rho = blind_demo.getObjFromSession('rho_bytes',params.group)
-            orig_z = blind_demo.getObjFromSession('z_bytes',params.group)
-            orig_g = blind_demo.getObjFromSession('g_bytes',params.group)
-            orig_h = blind_demo.getObjFromSession('h_bytes',params.group)
+            orig_y = until.getObjFromSession('y_bytes',params.group)
+            orig_zeta1 = until.getObjFromSession('zeta1_bytes',params.group)
+            orig_zeta2 = until.getObjFromSession('zeta2_bytes',params.group)
+            orig_omega = until.getObjFromSession('omega_bytes',params.group)
+            orig_sigma1 = until.getObjFromSession('sigma1_bytes',params.group)
+            orig_sigma2 = until.getObjFromSession('sigma2_bytes',params.group)
+            orig_delta = until.getObjFromSession('delta_bytes',params.group)
+            orig_rho = until.getObjFromSession('rho_bytes',params.group)
+            orig_z = until.getObjFromSession('z_bytes',params.group)
+            orig_g = until.getObjFromSession('g_bytes',params.group)
+            orig_h = until.getObjFromSession('h_bytes',params.group)
             
+            alpha_bytes = until.getObjFromSession('alpha_bytes',params.group)
+            beta1_bytes = until.getObjFromSession('beta1_bytes',params.group)
+            beta2_bytes = until.getObjFromSession('beta2_bytes',params.group)
+            print("alpha_bytes", alpha_bytes)
+            print("beta1_bytes", beta1_bytes)
+            print("beta2_bytes", beta2_bytes)
             
             lhs, rhs = blind_demo.verify(orig_rho, orig_omega, orig_delta, orig_sigma1,orig_sigma2, orig_h,orig_g, m, orig_y, orig_zeta1, orig_zeta2,orig_z,params)
             

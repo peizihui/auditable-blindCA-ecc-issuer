@@ -28,5 +28,6 @@ handler.setLevel(logging.WARNING)
 app.logger.addHandler(handler)
 
 from .index import *
-from .issuing import *
+from .issuer_issuing import *
+from .user_issuing import *
 from .verifying import *

@@ -6,8 +6,7 @@ from charm.toolbox.ecgroup import ECGroup,G,ZR
 from charm.toolbox.eccurve import secp160k1,secp192k1,secp256k1
 from collections import namedtuple
 import hashlib
-from flask import session
-from charm.core.engine.util import objectToBytes, bytesToObject
+from core import until
 
 
 Parameters = namedtuple('Parameters', ['secp', 'group', 'g', 'h'])
@@ -32,15 +31,6 @@ def choose_parameters_secp160k1():
     g, h = group.random(G), group.random(G)
     parameters = Parameters(type, group, g, h)
     return parameters
-
-def point2Obj(x, group):
-    import binascii
-    temp_str = hex(x)[2:]
-    dict_ecc = {708: 42,
-                711: 48,
-                714: 64}
-    temp_str = (dict_ecc[group.groupType()] - len(temp_str)) * '0' + temp_str
-    return group.encode(binascii.a2b_hex(temp_str), include_ctr=True)
 
 def issuer_choose_keypair(group,orig_g):
     x = group.random(ZR)
@@ -94,95 +84,71 @@ def digest(data, parameters):
 ### Protocol stuff ###
 class Issuer:
     '''Issuer S from the paper'''
-    def __init__(self, g, h, x, y,parameters):
+    def __init__(self, g, h, x, y, z, parameters):
         self.parameters = parameters
-        self.g, self.h = g,h
+        self.g, self.h, self.z = g, h, z
         self.IssuerKeypair = IssuerKeypair(x, y)
-        
-    def start(self,z,upsilon,mu,d,s1,s2):
-        self.z = z
-        self.upsilon = upsilon
-        self.mu = mu
-        self.d = d
-        self.s1= s1
-        self.s2= s2
-        
 
-    def protocol_two(self,zu):
+    def protocol_two(self,yt,upsilon,zu,mu,s1,s2,d):
         
-        self.z1 = self.tkey ** self.upsilon
+        z1 = yt ** upsilon
+        z2 = zu * (z1 ** -1)
+        a = self.parameters.g ** mu
+        b1 = (self.parameters.g ** s1) * (z1 ** d) 
+        b2 = (self.parameters.h ** s2) * (z2 ** d)
         
-        self.z2 = zu / self.z1
-        
-        self.a = self.parameters.g ** self.mu
-        
-        self.b1 = (self.parameters.g ** self.s1) * (self.z1 ** self.d) 
-        
-        self.b2 = (self.parameters.h ** self.s2) * (self.z2 ** self.d)
-        
-        return self.z1, self.a, self.b1, self.b2
+        return z1, z2, a, b1, b2
 
-    def protocol_four(self, e):
-        self.c = e -  self.d
-        self.r = self.mu - self.c * self.IssuerKeypair.x
-        return self.r, self.c, self.s1, self.s2, self.d
+    def protocol_four(self, e, d, mu):
+        c = e -  d
+        r = mu - c * self.IssuerKeypair.x
+        return r, c
     
-    def protocol_six(self, xi):
-        return xi ** self.upsilon
+    def protocol_six(self, xi, upsilon):
+        return xi ** upsilon
 
 class User:
     '''User U from the paper'''
-    def __init__(self, g, h, gamma, xi, parameters):
+    def __init__(self, g, h, z, gamma, xi, parameters):
         self.parameters = parameters
-        self.g, self.h = g, h
+        self.g, self.h, self.z = g, h, z
         self.UserKeypair = UserKeypair(gamma, xi)
         
-    def start(self, t1, t2, t3, t4, t5, z, y):
-        self.t1, self.t2, self.t3, self.t4,self.t5 = t1, t2, t3, t4, t5
-        self.z = z
-        self.y = y
-        
-    def protocol_one(self):
-        self.z_u = self.z ** (self.UserKeypair.gamma ** -1)
-        return self.z_u
+    def protocol_one(self,z,gamma):
+        zu = z ** (gamma ** -1)
+        return zu
 
-    def protocol_three(self, z1, a, b1, b2, m):
-        self.zeta1 = z1 ** self.UserKeypair.gamma
-        self.zeta2 = self.z / self.zeta1
-        self.alpha = (a * (self.parameters.g ** self.t1) * (self.y ** self.t2))
-        self.beta1 = ((b1 ** self.UserKeypair.gamma) * (self.parameters.g ** self.t3) * (self.zeta1 ** self.t5))
-        self.beta2 = ((b2 ** self.UserKeypair.gamma) * (self.parameters.h ** self.t4) * (self.zeta2 ** self.t5))
-        self.epsilon = self.parameters.group.hash((self.zeta1, self.alpha, self.beta1, self.beta2, m),ZR)
-        self.e =  self.epsilon - self.t2 - self.t5
-        return self.e
+    def protocol_three(self, z1, a, b1, b2, m, y, t1, t2, t3, t4, t5):
+        zeta1 = z1 ** self.UserKeypair.gamma
+        zeta2 = self.z * (zeta1 ** -1)
+        alpha = (a * (self.parameters.g ** t1) * (y ** t2))
+        beta1 = ((b1 ** self.UserKeypair.gamma) * (self.parameters.g ** t3) * (zeta1 ** t5))
+        beta2 = ((b2 ** self.UserKeypair.gamma) * (self.parameters.h ** t4) * (zeta2 ** t5))
+        epsilon = self.parameters.group.hash((zeta1, alpha, beta1, beta2, m), ZR)
+        e =  epsilon - t2 - t5
+        return zeta1, zeta2, alpha, beta1, beta2, epsilon, e 
 
-    def protocol_five(self, r, c, s1,s2, d):
-        rho = r + self.t1
-        omega = c + self.t2
-        sigma1 = (self.UserKeypair.gamma * s1) + self.t3
-        sigma2 = (self.UserKeypair.gamma * s2) + self.t4
-        delta = d + self.t5
+    def protocol_five(self, r, c, s1, s2, d, t1, t2, t3, t4, t5):
+        rho = r + t1
+        omega = c + t2
+        sigma1 = (self.UserKeypair.gamma * s1) + t3
+        sigma2 = (self.UserKeypair.gamma * s2) + t4
+        delta = d + t5
         return rho, omega, sigma1, sigma2, delta
 
-def verify(rho, omega, delta, sigma1,sigma2, h,g,m, y, zeta1, zeta2,z, parameters):
-    '''Signature verification'''
+def verify(rho, omega, delta, sigma1,sigma2, h, g, m, y, zeta1, zeta2, z, parameters):
+
     lhs = omega + delta
 
-    tmp1 = ((g ** rho) * (y ** omega)) 
+    tmp1 = ((g ** rho) * (y ** omega))
     tmp2 = (g ** sigma1 * zeta1 ** delta) 
     tmp3 = (h ** sigma2 * zeta2 ** delta) 
+    
+    print("tmp1", tmp1)
+    print("tmp2", tmp2)
+    print("tmp3", tmp3)
 
     rhs = parameters.group.hash((zeta1, tmp1, tmp2, tmp3, m),ZR)
     
     return lhs,rhs
-
-# tools
-def getObjFromSession(key, group):
-    value_bytes = session.get(key)
-    orig_value = bytesToObject(value_bytes, group)
-    return orig_value
-
-def putBytesToSession(key, value, group):
-    value_bytes = objectToBytes(value, group)
-    session[key] = value_bytes
 
