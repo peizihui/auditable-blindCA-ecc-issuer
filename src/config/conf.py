@@ -5,7 +5,7 @@ import os
 # python -m pip install pickle
 # WEBSITE CONFIG #
 HOST = '0.0.0.0'
-PORT = 8080
+PORT = 8081
 #curpath = os.path.dirname(__file__)
 #curpath = curpath[0:int(curpath.index('\config'))]
 

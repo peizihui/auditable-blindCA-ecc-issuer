@@ -10,9 +10,18 @@ from core import until
 
 @app.route('/issuing')
 def issuing():
+    secp = session.get('secp')
+
+    if secp == 'secp256k1':
+        params = blind_demo.choose_parameters_secp256k1()
+    elif secp == 'secp192k1':
+        params = blind_demo.choose_parameters_secp192k1()
+    
     yt = str(request.args.get('pk'))
+    orig_y = until.point2Obj(int(yt), params.group)
+    
     contractAddress = str(request.args.get('contractAddress'))
-    session['yt'] = yt
+    until.putBytesToSession('yt_bytes', orig_y, params.group)
     session['cas'] = contractAddress
     
     return render_template('issuing.html')
@@ -137,8 +146,6 @@ def issuerExecuteTwo():
     try:
             issuer = getIssuerObj()
             
-            
-            
             print(issuer.parameters.group)
             
             orig_zu = until.getObjFromSession('zu_bytes',issuer.parameters.group)
@@ -148,13 +155,15 @@ def issuerExecuteTwo():
             orig_s2 = until.getObjFromSession('s2_bytes',issuer.parameters.group)
             orig_d = until.getObjFromSession('d_bytes',issuer.parameters.group)
             
-            tracerparams = blind_demo.tracer_choose_keypair(issuer.parameters.group,issuer.g)
-            xt = tracerparams.yt
-            yt = tracerparams.yt
-            until.putBytesToSession('xt_bytes', xt, issuer.parameters.group)
-            until.putBytesToSession('yt_bytes', yt, issuer.parameters.group)
+            #tracerparams = blind_demo.tracer_choose_keypair(issuer.parameters.group,issuer.g)
+            #xt = tracerparams.yt
+            #yt = tracerparams.yt
+            #until.putBytesToSession('xt_bytes', xt, issuer.parameters.group)
+            #until.putBytesToSession('yt_bytes', yt, issuer.parameters.group)
             
-            z1, z2, a, b1, b2 = issuer.protocol_two(yt,orig_upsilon,orig_zu,orig_mu,orig_s1,orig_s2,orig_d)
+            orig_yt = until.getObjFromSession('yt_bytes',issuer.parameters.group)
+            
+            z1, z2, a, b1, b2 = issuer.protocol_two(orig_yt,orig_upsilon,orig_zu,orig_mu,orig_s1,orig_s2,orig_d)
             
             until.putBytesToSession('z1_bytes', z1, issuer.parameters.group)
             until.putBytesToSession('z2_bytes', z2, issuer.parameters.group)
@@ -201,7 +210,7 @@ def issuerExecuteSix():
             
             until.putBytesToSession('xiupsilon_bytes',xiupsilon, issuer.parameters.group)
             
-            rjson  = str(orig_xi) + "," + str(xiupsilon) + "," + str(contractAddress)
+            rjson  = str(orig_xi) + "#" + str(xiupsilon) + "#" + str(contractAddress)
             return rjson
         
     except Exception as e:

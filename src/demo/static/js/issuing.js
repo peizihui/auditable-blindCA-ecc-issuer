@@ -118,7 +118,7 @@ $(function(){
 	
 	$("#issuerExecuteSix").click(function(){
 		$.get("issuerExecuteSix",function(result) {
-			    var rstring=result.split(",");	
+			    var rstring=result.split("#");	
 			    $("#upk").val(rstring[0]);
 			    $("#identity").val(rstring[1]);
 			    $("#contractAddress").val(rstring[2]);
