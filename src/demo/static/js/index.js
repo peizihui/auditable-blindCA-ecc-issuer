@@ -14,9 +14,6 @@ $(function(){
 			$("#b1").val(rstring[2]);
 			$("#b2").val(rstring[2]);
 			
-			$("#n1").val(rstring[3]);
-			$("#n2").val(rstring[3]);
-			
 			$("#g1").val(rstring[4]);
 			$("#g2").val(rstring[4]);
 			
@@ -37,6 +34,7 @@ $(function(){
 			
 			//$('input:radio').find("id:contains('"+secp+"')").attr('checked', 'true');
 			$("#"+secp).attr('checked', true);
+			$("#i"+secp).css('display',''); 
 			
 		}
 	});
@@ -46,7 +44,12 @@ $(function(){
         //var selectParam = $(this).children("option:selected").val();
         var selectParam = $("input[type=radio]:checked").val();
 		var postdata = {'secp':selectParam}
-		alert(selectParam)
+		
+		$("#isecp256k1").css('display','none'); 
+		$("#isecp192k1").css('display','none'); 
+		
+		$("#i"+selectParam).css('display',''); 
+		
 		$.post("setup", postdata,function(result) {
 				
 				var rstring=result.split("#");	
@@ -58,9 +61,6 @@ $(function(){
 				
 				$("#b1").val(rstring[2]);
 				$("#b2").val(rstring[2]);
-				
-				$("#n1").val(rstring[3]);
-				$("#n2").val(rstring[3]);
 				
 				$("#g1").val(rstring[4]);
 				$("#g2").val(rstring[4]);
@@ -94,10 +94,12 @@ $(function(){
 	
 	$("#confirm").click(function(){
 		
+		var a = $.trim($("#a1").val());
+	    var b = $.trim($("#b1").val());
 		var p = $.trim($("#p1").val());
-	    var q = $.trim($("#q1").val());
 	    var g = $.trim($("#g1").val());
 	    var h = $.trim($("#h1").val());
+	    
 	    
 	    var x = $.trim($("#x").val());
 	    var y = $.trim($("#y").val());
@@ -107,7 +109,7 @@ $(function(){
 	    
 	    var z = $.trim($("#z1").val());
 	    
-	    param = "?p=" + p + "&q=" + q + "&g=" + g + "&h=" + h + "&x=" + x + "&y=" + y + "&gamma=" + gamma + "&xi=" + xi + "&z="+ z + "&N=40"
+	    param = "?p=" + p + "&g=" + g + "&h=" + h + "&x=" + x + "&y=" + y + "&gamma=" + gamma + "&xi=" + xi + "&z="+ z + "&a="+ a + "&b="+ b
 	    
 		window.location.href= "http://127.0.0.1:8080/index_register.html" + param;
 	})
