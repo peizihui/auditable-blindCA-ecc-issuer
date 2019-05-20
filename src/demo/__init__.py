@@ -4,6 +4,7 @@ from mongo import connect
 
 #from mongo import connect
 from flask_session import Session
+import datetime
 #from config import conf
 
 from logging.handlers import RotatingFileHandler
@@ -16,6 +17,7 @@ app.config['ASK_VERIFY_REQUESTS'] = False
 #db = connect();
 
 app.config['SESSION_PERMANENT'] = True
+app.permanent_session_lifetime = datetime.timedelta(seconds=60*60)
 app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 

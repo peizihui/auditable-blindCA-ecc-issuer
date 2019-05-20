@@ -110,7 +110,7 @@ $(function(){
 	
 	$("#issuerExecuteFour").click(function(){
 		$.get("issuerExecuteFour",function(result) {
-			    var rstring=result.split(",");	
+			    var rstring=result.split("#");	
 			    $("#c").val(rstring[0]);
 			    $("#r").val(rstring[1]);
 		 });
@@ -172,7 +172,7 @@ $(function(){
 	$("#userExecuteFive").click(function(){
 		$.get("userExecuteFive",function(result) {
 			    
-			    var rstring=result.split(",");	
+			    var rstring=result.split("#");	
 			    
 			    $("#rho").val(rstring[0]);
 			    $("#omega").val(rstring[1]);
@@ -248,7 +248,7 @@ onload = function () {
     	var postdata = {"m": result}
 		$.post("userExecuteThree",postdata,function(result) {
 			    
-			    var rstring=result.split(",");	
+			    var rstring=result.split("#");	
 			    $("#zeta1").val(rstring[0]);
 			    $("#zeta_1").val(rstring[0]);
 			    $("#zeta2").val(rstring[1]);

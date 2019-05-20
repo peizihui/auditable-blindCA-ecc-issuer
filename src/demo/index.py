@@ -33,12 +33,14 @@ def tracing():
 @app.route('/init', methods=['GET'])
 def init():
     try:
-        p = session.get('p')
-        a = session.get('a')
-        b = session.get('b')
-        n = session.get('n')
+        uid = until.get_mac_address()
         
-        secp = session.get('secp')
+        p = session.get(uid+'p')
+        a = session.get(uid+'a')
+        b = session.get(uid+'b')
+        n = session.get(uid+'n')
+        
+        secp = session.get(uid+'secp')
         
         if secp == 'secp256k1':
             params = blind_demo.choose_parameters_secp256k1()
@@ -46,15 +48,15 @@ def init():
             params = blind_demo.choose_parameters_secp192k1()
         
         
-        orig_h = until.getObjFromSession('h_bytes',params.group)
-        orig_g = until.getObjFromSession('g_bytes',params.group)
+        orig_h = until.getObjFromSession(uid+'h_bytes',params.group)
+        orig_g = until.getObjFromSession(uid+'g_bytes',params.group)
         
         
-        orig_x = until.getObjFromSession('x_bytes',params.group)
-        orig_y = until.getObjFromSession('y_bytes',params.group)
-        orig_z = until.getObjFromSession('z_bytes',params.group)
-        orig_gamma = until.getObjFromSession('gamma_bytes',params.group)
-        orig_xi = until.getObjFromSession('xi_bytes',params.group)
+        orig_x = until.getObjFromSession(uid+'x_bytes',params.group)
+        orig_y = until.getObjFromSession(uid+'y_bytes',params.group)
+        orig_z = until.getObjFromSession(uid+'z_bytes',params.group)
+        orig_gamma = until.getObjFromSession(uid+'gamma_bytes',params.group)
+        orig_xi = until.getObjFromSession(uid+'xi_bytes',params.group)
 
         rjson = str(p) + '#' + str(a) + '#' + str(b) + '#' + str(n) + '#' + str(orig_g) + '#' + str(orig_h) \
         + '#' + str(secp) + "#" + str(orig_x) + '#' + str(orig_y) + '#' + str(orig_z) + '#' + str(orig_gamma) + '#' + str(orig_xi)
@@ -67,7 +69,7 @@ def init():
 @app.route('/setup', methods=['POST'])
 def setup():
     try:
-        #session.clear()
+        uid = until.get_mac_address()
 
         secp = str(request.form['secp'])
 
@@ -106,15 +108,16 @@ def setup():
             g = params.g
             h = params.h
             
-        until.putBytesToSession('g_bytes', g, params.group)
-        until.putBytesToSession('h_bytes', h, params.group)
+        until.putBytesToSession(uid+'g_bytes', g, params.group)
+        until.putBytesToSession(uid+'h_bytes', h, params.group)
         
-        session['p'] = p
-        session['a'] = a
-        session['b'] = b
-        session['n'] = n
+        session[uid+'p'] = p
+        session[uid+'a'] = a
+        session[uid+'b'] = b
+        session[uid+'n'] = n
         
-        session['secp'] = secp
+        session[uid+'secp'] = secp
+        print(session.get(uid+'secp'))
 
         rjson = str(p) + '#' + str(a) + '#' + str(b) + '#' + str(n) + '#' + str(g) + '#' + str(h)
         return rjson
@@ -137,28 +140,28 @@ def setup():
 @app.route('/issuerkey', methods=['POST'])
 def issuerkey():
     try:
-        
-        secp = session.get('secp')
-        print(session.get('secp'))
+        uid = until.get_mac_address()
+        secp = session.get(uid+'secp')
+        print(session.get(uid+'secp'))
         
         if secp == 'secp256k1':
             params = blind_demo.choose_parameters_secp256k1()
         elif secp == 'secp192k1':
             params = blind_demo.choose_parameters_secp192k1()
         
-        orig_h = until.getObjFromSession('h_bytes',params.group)
-        orig_g = until.getObjFromSession('g_bytes',params.group)
+        orig_h = until.getObjFromSession(uid+'h_bytes',params.group)
+        orig_g = until.getObjFromSession(uid+'g_bytes',params.group)
         issuerparams = blind_demo.issuer_choose_keypair(params.group,orig_g)
         x = issuerparams.x
         y = issuerparams.y
         
-        until.putBytesToSession('x_bytes', x, params.group)
-        until.putBytesToSession('y_bytes', y, params.group)
+        until.putBytesToSession(uid+'x_bytes', x, params.group)
+        until.putBytesToSession(uid+'y_bytes', y, params.group)
 
         print(y)
         
         z = blind_demo.gnerate_common_z(params.group, orig_g, orig_h, y)
-        until.putBytesToSession('z_bytes',z, params.group)
+        until.putBytesToSession(uid+'z_bytes',z, params.group)
         
         rjson = str(x) + "#" + str(y) + "#" + str(z)
         return rjson
@@ -169,8 +172,9 @@ def issuerkey():
 @app.route('/userkey', methods=['POST'])
 def userkey():
     try:
-        secp = session.get('secp')
-        print(session.get('secp'))
+        uid = until.get_mac_address()
+        secp = session.get(uid+'secp')
+        print(session.get(uid+'secp'))
         print(secp)
 
         if secp == 'secp256k1':
@@ -178,15 +182,15 @@ def userkey():
         elif secp == 'secp192k1':
             params = blind_demo.choose_parameters_secp192k1()
 
-        orig_g = until.getObjFromSession('g_bytes',params.group)
+        orig_g = until.getObjFromSession(uid+'g_bytes',params.group)
 
         userparams = blind_demo.user_choose_keypair(params.group,orig_g)
 
         xi = userparams.xi
         gamma = userparams.gamma
         
-        until.putBytesToSession('gamma_bytes',gamma, params.group)
-        until.putBytesToSession('xi_bytes',xi, params.group)
+        until.putBytesToSession(uid+'gamma_bytes',gamma, params.group)
+        until.putBytesToSession(uid+'xi_bytes',xi, params.group)
 
         rjson = str(gamma) + '#' + str(xi)
         

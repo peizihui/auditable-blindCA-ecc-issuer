@@ -16,7 +16,11 @@ def verifying():
 def getCred():
     try:
 
-            secp = session.get('secp')
+            uid = until.get_mac_address()
+            print("-----------------")
+            print(uid)
+            print("-----------------")
+            secp = session.get(uid+'secp')
         
             if secp == 'secp256k1':
                 params = blind_demo.choose_parameters_secp256k1()
@@ -24,15 +28,15 @@ def getCred():
                 params = blind_demo.choose_parameters_secp192k1()
             
             
-            orig_y = until.getObjFromSession('y_bytes',params.group)
-            orig_zeta1 = until.getObjFromSession('zeta1_bytes',params.group)
-            orig_omega = until.getObjFromSession('omega_bytes',params.group)
-            orig_sigma1 = until.getObjFromSession('sigma1_bytes',params.group)
-            orig_sigma2 = until.getObjFromSession('sigma2_bytes',params.group)
-            orig_delta = until.getObjFromSession('delta_bytes',params.group)
-            orig_rho = until.getObjFromSession('rho_bytes',params.group)
+            orig_y = until.getObjFromSession(uid+'y_bytes',params.group)
+            orig_zeta1 = until.getObjFromSession(uid+'zeta1_bytes',params.group)
+            orig_omega = until.getObjFromSession(uid+'omega_bytes',params.group)
+            orig_sigma1 = until.getObjFromSession(uid+'sigma1_bytes',params.group)
+            orig_sigma2 = until.getObjFromSession(uid+'sigma2_bytes',params.group)
+            orig_delta = until.getObjFromSession(uid+'delta_bytes',params.group)
+            orig_rho = until.getObjFromSession(uid+'rho_bytes',params.group)
             
-            m = session.get('m')
+            m = session.get(uid+'m')
             
             rjson = str(orig_y) + '#' + str(orig_zeta1) + '#' + str(orig_rho)+ '#' + str(orig_omega)+ '#' + str(orig_sigma1)+ '#' + str(orig_sigma2)+ '#' + str(orig_delta)+ '#' + str(m)
             
@@ -43,30 +47,31 @@ def getCred():
 @app.route("/verifyCred", methods=['GET'])
 def verifyCred():
     try:
-            secp = session.get('secp')
+            uid = until.get_mac_address()
+            secp = session.get(uid+'secp')
         
             if secp == 'secp256k1':
                 params = blind_demo.choose_parameters_secp256k1()
             elif secp == 'secp192k1':
                 params = blind_demo.choose_parameters_secp192k1()
             
-            m = session.get('m')
+            m = session.get(uid+'m')
             
-            orig_y = until.getObjFromSession('y_bytes',params.group)
-            orig_zeta1 = until.getObjFromSession('zeta1_bytes',params.group)
-            orig_zeta2 = until.getObjFromSession('zeta2_bytes',params.group)
-            orig_omega = until.getObjFromSession('omega_bytes',params.group)
-            orig_sigma1 = until.getObjFromSession('sigma1_bytes',params.group)
-            orig_sigma2 = until.getObjFromSession('sigma2_bytes',params.group)
-            orig_delta = until.getObjFromSession('delta_bytes',params.group)
-            orig_rho = until.getObjFromSession('rho_bytes',params.group)
-            orig_z = until.getObjFromSession('z_bytes',params.group)
-            orig_g = until.getObjFromSession('g_bytes',params.group)
-            orig_h = until.getObjFromSession('h_bytes',params.group)
+            orig_y = until.getObjFromSession(uid+'y_bytes',params.group)
+            orig_zeta1 = until.getObjFromSession(uid+'zeta1_bytes',params.group)
+            orig_zeta2 = until.getObjFromSession(uid+'zeta2_bytes',params.group)
+            orig_omega = until.getObjFromSession(uid+'omega_bytes',params.group)
+            orig_sigma1 = until.getObjFromSession(uid+'sigma1_bytes',params.group)
+            orig_sigma2 = until.getObjFromSession(uid+'sigma2_bytes',params.group)
+            orig_delta = until.getObjFromSession(uid+'delta_bytes',params.group)
+            orig_rho = until.getObjFromSession(uid+'rho_bytes',params.group)
+            orig_z = until.getObjFromSession(uid+'z_bytes',params.group)
+            orig_g = until.getObjFromSession(uid+'g_bytes',params.group)
+            orig_h = until.getObjFromSession(uid+'h_bytes',params.group)
             
-            alpha_bytes = until.getObjFromSession('alpha_bytes',params.group)
-            beta1_bytes = until.getObjFromSession('beta1_bytes',params.group)
-            beta2_bytes = until.getObjFromSession('beta2_bytes',params.group)
+            alpha_bytes = until.getObjFromSession(uid+'alpha_bytes',params.group)
+            beta1_bytes = until.getObjFromSession(uid+'beta1_bytes',params.group)
+            beta2_bytes = until.getObjFromSession(uid+'beta2_bytes',params.group)
             print("alpha_bytes", alpha_bytes)
             print("beta1_bytes", beta1_bytes)
             print("beta2_bytes", beta2_bytes)
