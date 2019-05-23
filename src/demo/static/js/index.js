@@ -14,6 +14,9 @@ $(function(){
 			$("#b1").val(rstring[2]);
 			$("#b2").val(rstring[2]);
 			
+			$("#n1").val(rstring[3]);
+			$("#n2").val(rstring[3]);
+			
 			$("#g1").val(rstring[4]);
 			$("#g2").val(rstring[4]);
 			
@@ -62,6 +65,9 @@ $(function(){
 				$("#b1").val(rstring[2]);
 				$("#b2").val(rstring[2]);
 				
+				$("#n1").val(rstring[3]);
+				$("#n2").val(rstring[3]);
+				
 				$("#g1").val(rstring[4]);
 				$("#g2").val(rstring[4]);
 				
@@ -97,6 +103,7 @@ $(function(){
 		var a = $.trim($("#a1").val());
 	    var b = $.trim($("#b1").val());
 		var p = $.trim($("#p1").val());
+		var n = $.trim($("#n1").val());
 	    var g = $.trim($("#g1").val());
 	    var h = $.trim($("#h1").val());
 	    
@@ -109,7 +116,7 @@ $(function(){
 	    
 	    var z = $.trim($("#z1").val());
 	    
-	    param = "?p=" + p + "&g=" + g + "&h=" + h + "&x=" + x + "&y=" + y + "&gamma=" + gamma + "&xi=" + xi + "&z="+ z + "&a="+ a + "&b="+ b
+	    param = "?p=" + p + "&n=" + n + "&g=" + g + "&h=" + h + "&x=" + x + "&y=" + y + "&gamma=" + gamma + "&xi=" + xi + "&z="+ z + "&a="+ a + "&b="+ b
 	    
 		window.location.href= "http://127.0.0.1:8080/index_register.html" + param;
 	})

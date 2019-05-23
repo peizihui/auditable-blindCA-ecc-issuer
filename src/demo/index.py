@@ -47,7 +47,6 @@ def init():
         elif secp == 'secp192k1':
             params = blind_demo.choose_parameters_secp192k1()
         
-        
         orig_h = until.getObjFromSession(uid+'h_bytes',params.group)
         orig_g = until.getObjFromSession(uid+'g_bytes',params.group)
         
