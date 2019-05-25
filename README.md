@@ -1,10 +1,17 @@
-# Auditable-blindCA-demo
+# Auditable-blindCA-issuer
 
-Auditable-blindCA-demo issues certificates blindly and reveals the blindness by tracing with the privacy-preserving smart contract. 
+
+As shown in the following picture, Auditable-blindCA-issuer is a single application as a suite of the whole system. It is responsible for blindly issuing and verifying certificates. There is no interaction with blockchain in this application. 
+
+<div align="center">
+<img src="./architecture.png" width = "90%"/> 
+</div>
+
+We refer the interested readers to [auditable-blindCA-core](https://github.com/blockchain-crypto-lab/auditable-blindCA-core) to understand the whole system architecture.
 
 ## Quick start using Docker
 
-### Getting the image
+### Get the image
 
 1. First ensure you have Docker installed. [See Docker installation help](https://docs.docker.com/install/).
 
@@ -16,18 +23,15 @@ Auditable-blindCA-demo issues certificates blindly and reveals the blindness by 
 
     This image will expose port 8080 and 8081 inside the container and receive web requests, passing different requests to issuing service and tracing service respectively.
 
-### Running the Docker
+### Run the Docker
 
-    ```
-    docker run -t -i -p 8080:8080 -p 8081:8081 rujia/contract-kit:v15.
-    ```
+   
+    docker run -t -i -p 8081:8081 rujia/contract-kit:v15.
+   
 
-### Starting  the services
+### Start the services
  
- ```
+   ```
    > cd auditable-blindCA-demo/src
-   > python start_app.py 
-    
-   > cd auditable-blindCA-tracer
-   > npm run dev 
+   > python start_app.py  
    ```
