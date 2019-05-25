@@ -21,7 +21,7 @@ We refer the interested readers to [auditable-blindCA-core](https://github.com/b
     docker pull rujia/contract-kit:v15.
     ```
 
-    This image will expose port 8080 and 8081 inside the container and receive web requests, passing different requests to issuing service and tracing service respectively.
+    This image will expose 8081 inside the container and receive web requests, passing different requests to issuing service.
 
 ### Run the Docker
 
